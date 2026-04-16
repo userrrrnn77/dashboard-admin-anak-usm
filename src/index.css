@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui;
+
+  /* Emerald Palette */
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+
+  /* Amber/Gold Palette */
+  --color-secondary-500: #f59e0b;
+  --color-secondary-600: #d97706;
+
+  /* Dark Palette */
+  --color-dark-bg: #0f172a;
+  --color-dark-card: #1e293b;
+  --color-dark-border: #334155;
+}
+
+/* --- SOLUSI DARK MODE V4 --- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    background-color: #f8fafc;
+    /* Slate 50 */
+    color: #0f172a;
+    /* Slate 900 */
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dark body {
+    background-color: var(--color-dark-bg);
+    color: #f1f5f9;
+    /* Slate 100 */
+  }
+
+  /* --- CUSTOM SCROLLBAR WIZARD MODE --- */
+
+  /* 1. Chrome, Safari, Edge */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* LIGHT MODE: Secondary 600 (Gold/Amber) */
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-secondary-600);
+    border-radius: 20px;
+    /* Efek Floating: Kasih border warna sama kayak BG body */
+    border: 2px solid #f8fafc;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-secondary-500);
+  }
+
+  /* DARK MODE: Primary 600 (Emerald) */
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary-600);
+    border: 2px solid var(--color-dark-bg);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary-500);
+  }
+
+  /* 2. Firefox Support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary-600) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: var(--color-primary-600) transparent !important;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/90 backdrop-blur-lg border border-slate-200 shadow-xl rounded-2xl;
+  }
+
+  .dark .glass-card {
+    @apply bg-dark-card/90 border-dark-border;
+  }
+
+  /* Custom Utility buat selection text biar ijo elit */
+  ::selection {
+    @apply bg-primary-500 text-white;
+  }
+}
