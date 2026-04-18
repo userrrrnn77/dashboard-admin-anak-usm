@@ -5,7 +5,7 @@ export const getAllProgram = () => api.get<ResponseBre>("/baitul-maal");
 export const getProgramById = (id: string) =>
   api.get<ResponseBre>(`/baitul-maal/${id}`);
 
-interface CreateBaitulMaal {
+export interface CreateBaitulMaal {
   title?: string;
   tagline?: string;
   description?: string;

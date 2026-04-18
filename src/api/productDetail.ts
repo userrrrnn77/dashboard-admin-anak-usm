@@ -5,7 +5,7 @@ export interface ISection {
   items: string[];
 }
 
-interface productDetail {
+export interface productDetail {
   title?: string;
   description?: string;
   sections?: ISection[];

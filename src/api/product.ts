@@ -5,7 +5,7 @@ export const getAllProduct = () => api.get<ResponseBre>("/product");
 export const getProductFullById = (id: string) =>
   api.get(`/product/full/${id}`);
 
-interface product {
+export interface product {
   title?: string;
   fullTitle?: string;
   desc?: string;

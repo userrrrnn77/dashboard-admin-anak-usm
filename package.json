@@ -1,8 +1,12 @@
 {
-  "name": "admin",
+  "name": "dashboard-admin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": {
+    "nama-kelompok": "ini nama kelompok kalian bre",
+    "name": "isi nama elu bre"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -20,6 +24,7 @@
     "react-hook-form": "^7.72.1",
     "react-router-dom": "^7.14.1",
     "sonner": "^2.0.7",
+    "sweetalert2": "^11.26.24",
     "tailwindcss": "^4.2.2",
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
@@ -37,5 +42,6 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",
     "vite": "^8.0.4"
-  }
+  },
+  "license": "MIT"
 }
