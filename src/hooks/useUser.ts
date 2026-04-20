@@ -6,6 +6,7 @@ import {
   acceptedRegister,
   getAllRegistration,
   getRegistrationById,
+  deleteRegistrationById,
 } from "../api/user";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -14,6 +15,56 @@ interface ErrorResponse {
   message: string;
 }
 
+// 🏛️ Interface buat Jenderal TS biar kaga tantrum lagi
+export interface RegistrationData {
+  _id: string; // ID dari MongoDB
+  fullName: string;
+  birthPlace: string;
+  birthDate: string | Date; // Di Frontend biasanya jadi string ISO pas ditarik, tapi kita fleksibel aja
+  gender: "Laki-laki" | "Perempuan";
+  addressKTP: string;
+  addressDomisili: string;
+  phoneNumber: string;
+  ktpNumber: string;
+  occupation:
+    | "Karyawan"
+    | "Peg. Negeri"
+    | "TNI/POLRI"
+    | "Pedagang/Wirausaha"
+    | "Manajer"
+    | "Profesional"
+    | "Pelajar/Mahasiswa"
+    | "Lainnya";
+  maritalStatus: "Lajang" | "Menikah" | "Janda" | "Duda";
+  education: "SD/SMP" | "SMA" | "Akademi/D-3/S1" | "S2/S3";
+  religion: "Islam" | "Kristen/Katholik" | "Hindu" | "Budha";
+  monthlyIncome:
+    | "< Rp. 500.000,-"
+    | "Rp. 500.000 - 1.000.000"
+    | "Rp. 1 - 2 juta"
+    | "Rp. 2 - 3 juta"
+    | "Rp. 3 - 4 juta"
+    | "Rp. 4 - 5 juta"
+    | "Rp. 5 - 6 juta"
+    | "> Rp. 6.000.000,-";
+  selectedProduct:
+    | "SIRELA"
+    | "Simpanan Syariah"
+    | "SAJAAH"
+    | "Simpanan Hasanah"
+    | "SISUQUR"
+    | "SIAROFAH"
+    | "SISIDIK"
+    | "SIMAPAN"
+    | "SIHARA"
+    | "SIZawa";
+  initialDeposit: number;
+  isVerified: boolean;
+  heirName?: string;
+  heirAddress?: string;
+  createdAt?: string; // Dari timestamps
+  updatedAt?: string; // Dari timestamps
+}
 export const useUser = (userId?: string, registrationId?: string) => {
   const queryClient = useQueryClient();
 
@@ -75,20 +126,47 @@ export const useUser = (userId?: string, registrationId?: string) => {
     },
   });
 
+  const deleteRegistration = useMutation({
+    // 1. Pastiin namanya bener, sesuaikan ama API service lu
+    mutationFn: (id: string) => deleteRegistrationById(id),
+
+    onSuccess: async () => {
+      // Refresh list (WAJIB)
+      await queryClient.invalidateQueries({ queryKey: ["registrations"] });
+
+      // Refresh detail pake registrationId dari parameter hook
+      if (registrationId) {
+        queryClient.invalidateQueries({
+          queryKey: ["registrations", registrationId],
+        });
+      }
+
+      toast.success("Dah ilang, Bre!");
+    },
+
+    onError: (err: unknown) => {
+      const error = err as AxiosError<ErrorResponse>;
+      toast.error(error.response?.data?.message || "Gagal ACC pendaftar!");
+    },
+  });
+
   return {
     // Data Lists
     users: usersQuery.data?.data?.data || [],
-    registrations: registrationsQuery.data?.data?.data || [],
+    registrations:
+      (registrationsQuery.data?.data?.data as RegistrationData[]) || [],
 
     // Data Details
     userDetail: userDetailQuery.data?.data?.data || null,
-    registrationDetail: regDetailQuery.data?.data?.data || null,
+    registrationDetail:
+      (regDetailQuery.data?.data?.data as RegistrationData) || null,
 
     // Status
     isLoading: usersQuery.isLoading || registrationsQuery.isLoading,
     isDetailLoading: userDetailQuery.isLoading || regDetailQuery.isLoading,
 
     // Actions
+    deleteRegistration: deleteRegistration.mutate,
     deleteUser: deleteAction.mutate,
     approveUser: approveAction.mutate,
     isDeleting: deleteAction.isPending,

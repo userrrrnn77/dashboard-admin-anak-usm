@@ -7,7 +7,7 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, title, children}: ModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -19,7 +19,8 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
       />
 
       {/* Content */}
-      <div className="bg-white dark:bg-neutral-800 w-full max-w-lg rounded-2xl shadow-2xl z-10 overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div
+        className={`bg-white dark:bg-neutral-800 w-4xl max-w-xl rounded-2xl shadow-2xl z-10 overflow-hidden animate-in fade-in zoom-in duration-200`}>
         <div className="flex items-center justify-between p-6 border-b border-neutral-100 dark:border-neutral-700">
           <h3 className="text-xl font-semibold">{title}</h3>
           <button

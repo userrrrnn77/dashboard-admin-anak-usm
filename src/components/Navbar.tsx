@@ -9,7 +9,7 @@ export const Navbar = () => {
   return (
     <header className="h-16 border-b border-neutral-200 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md sticky top-0 z-10 px-6 flex items-center justify-between">
       <h2 className="text-sm font-medium text-neutral-500">
-        Selamat Datang, Wizard {user?.name}
+        Selamat Datang, Admin {user?.name}
       </h2>
 
       <div className="flex items-center gap-4">

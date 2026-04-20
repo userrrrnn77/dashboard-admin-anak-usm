@@ -1,6 +1,6 @@
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "danger" | "outline" | "ghost";
-  size?: "sm" | "md" | "lg"; // Tambahin ini biar kaga tantrum
+  variant?: "primary" | "danger" | "outline" | "ghost" | "success" | "warning"; // Tambah success & warning
+  size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 }
 
@@ -14,10 +14,14 @@ export const Button = ({
 }: ButtonProps) => {
   const variants = {
     primary: "bg-emerald-600 hover:bg-emerald-700 text-white",
+    success:
+      "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20", // Tambahin ini Bre!
     danger: "bg-red-500 hover:bg-red-600 text-white",
+    warning: "bg-amber-500 hover:bg-amber-600 text-white", // Buat jaga-jaga
     outline:
       "border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800",
-    ghost: "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+    ghost:
+      "hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400",
   };
 
   const sizes = {

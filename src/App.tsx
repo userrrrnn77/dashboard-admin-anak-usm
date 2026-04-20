@@ -12,19 +12,26 @@ import { MainLayout } from "./layouts/MainLayout";
 import { useAuthStore } from "./store/authStore";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-
-// Dummy Pages dulu biar kaga error pas di-import
-const Dashboard = () => (
-  <h1 className="text-2xl font-bold">Dashboard Dashboard-an</h1>
-);
-const Users = () => (
-  <h1 className="text-2xl font-bold">Daftar User & Pendaftar</h1>
-);
+import Dashboard from "./pages/Dashboard";
+import { useThemeStore } from "./store/themeStore";
+import { useEffect } from "react";
+import RegisterUser from "./pages/RegisterUser";
+import BaitulMaal from "./pages/BaitulMaal";
+import UsersPage from "./pages/Users";
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  const isDarkMode = useThemeStore((s) => s.isDarkMode);
   const isAuthenticated = useAuthStore((state) => state.isauthenticated);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -33,13 +40,9 @@ const App = () => {
           {/* Public Route */}
           <Route
             path="/login"
-            element={
-              !isAuthenticated ? <Login /> : <Navigate to="/" />
-            }
+            element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
           />
-          <Route
-          path="/123241674821658" element={<Register />} 
-          />
+          <Route path="/123241674821658" element={<Register />} />
 
           {/* Private Routes (Semua yang butuh Sidebar & Navbar) */}
           <Route
@@ -47,8 +50,9 @@ const App = () => {
               isAuthenticated ? <MainLayout /> : <Navigate to="/login" />
             }>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/users" element={<Users />} />
-            {/* Tambahin route lain di sini nanti, Bre */}
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/register" element={<RegisterUser />} />
+            <Route path="/baitul-maal" element={<BaitulMaal />} />
           </Route>
 
           {/* 404 */}

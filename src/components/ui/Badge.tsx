@@ -1,6 +1,6 @@
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "success" | "warning" | "danger" | "info";
+  variant?: "success" | "warning" | "danger" | "info" | "outline";
 }
 
 export const Badge = ({ children, variant = "info" }: BadgeProps) => {

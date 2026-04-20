@@ -6,15 +6,16 @@ import {
   Image as ImageIcon,
   HeartHandshake,
   LogOut,
+  UserRoundCheck,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
 const menuItems = [
   { name: "Dashboard", path: "/", icon: LayoutDashboard },
-//   bre ini berarti ada user karyawan dan user pendaftar atau gmn bre? 
-  { name: "Manajemen User", path: "/users", icon: Users },
+  { name: "Manajemen Admin", path: "/users", icon: Users },
+  { name: "Pendaftaran", path: "/register", icon: UserRoundCheck },
   { name: "Program Baitul Maal", path: "/baitul-maal", icon: HeartHandshake },
-  { name: "Produk & Layanan", path: "/products", icon: Package },
+  { name: "Produk", path: "/products", icon: Package },
   { name: "Galeri Kegiatan", path: "/gallery", icon: ImageIcon },
 ];
 
@@ -26,7 +27,7 @@ export const Sidebar = () => {
     <aside className="w-64 min-h-screen bg-white dark:bg-neutral-800 border-r border-neutral-200 dark:border-neutral-700 flex flex-col">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-          Admin Wizard
+          Mitra Hasanah
         </h1>
         <p className="text-xs text-neutral-500">v1.0 - Anak USM Edition</p>
       </div>

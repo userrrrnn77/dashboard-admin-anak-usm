@@ -1,5 +1,5 @@
 import { StatCard } from "../components/ui/StatCard";
-import { useUser } from "../hooks/useUser";
+import { useUser, type RegistrationData } from "../hooks/useUser";
 import { useBaitulMaal } from "../hooks/useBaitulMaal";
 import { Users, HeartHandshake, Package, UserCheck } from "lucide-react";
 // Import interface pendaftar buat ngilangin 'any' di map
@@ -16,7 +16,7 @@ const Dashboard = () => {
 
   // Type-safety casting buat linter lu yang galak
   const userList = users as User[];
-  const regList = registrations as User[]; // Registrasi biasanya strukturnya mirip User
+  const regList = registrations as RegistrationData[]; // Registrasi biasanya strukturnya mirip User
   const programList = programs as CreateBaitulMaal[];
 
   return (
@@ -67,13 +67,13 @@ const Dashboard = () => {
             {/* Slice sekarang aman karena udah di-cast ke Array */}
             {regList.slice(0, 3).map((reg) => (
               <div
-                key={reg.phone || reg.name}
+                key={reg.phoneNumber || reg.fullName}
                 className="flex items-center gap-3 text-sm">
                 <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold uppercase">
-                  {reg.name?.charAt(0) || "?"}
+                  {reg.fullName?.charAt(0) || "?"}
                 </div>
                 <div>
-                  <p className="font-medium">{reg.name || "Anonim"}</p>
+                  <p className="font-medium">{reg.fullName || "Anonim"}</p>
                   <p className="text-xs text-neutral-500">
                     Mendaftar sebagai Member
                   </p>

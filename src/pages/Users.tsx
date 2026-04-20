@@ -4,33 +4,17 @@ import { Table, THead } from "../components/ui/Table";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
-import {
-  UserCheck,
-  Trash2,
-  Eye,
-  Phone,
-  Shield,
-  User as UserIcon,
-} from "lucide-react";
+import { Trash2, Eye, Phone, Shield, User as UserIcon } from "lucide-react";
 import { type User } from "../api/user";
 import Swal from "sweetalert2";
 
 const UsersPage = () => {
-  const {
-    users,
-    registrations,
-    isLoading,
-    deleteUser,
-    isDeleting,
-    approveUser,
-    isApproving,
-  } = useUser();
+  const { users, deleteUser, isDeleting } = useUser();
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Casting biar TS lu yang galak itu sujud syukur
   const userList = users as User[];
-  const regList = registrations as User[];
 
   // --- Fungsi Delete dengan SweetAlert2 ---
   const handleDelete = (user: User) => {
@@ -56,64 +40,11 @@ const UsersPage = () => {
 
   return (
     <div className="space-y-10">
-      {/* SECTION 1: PENDAFTAR BARU (ACC) */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
-              <UserCheck size={24} /> Pendaftar Perlu ACC
-            </h2>
-            <p className="text-sm text-neutral-500">
-              Konfirmasi pendaftar baru biar jadi anggota resmi.
-            </p>
-          </div>
-          <Badge variant="warning">{regList.length} Menunggu</Badge>
-        </div>
-
-        <Table>
-          <THead>
-            <tr>
-              <th className="px-6 py-4">Nama</th>
-              <th className="px-6 py-4">No. HP</th>
-              <th className="px-6 py-4 text-center">Aksi</th>
-            </tr>
-          </THead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-700">
-            {regList.map((reg) => (
-              <tr
-                key={reg.phone}
-                className="hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors">
-                <td className="px-6 py-4 font-medium">{reg.name}</td>
-                <td className="px-6 py-4 text-neutral-500">{reg.phone}</td>
-                <td className="px-6 py-4 flex justify-center">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    isLoading={isApproving}
-                    onClick={() => approveUser(reg.phone as string)}>
-                    ACC Bre!
-                  </Button>
-                </td>
-              </tr>
-            ))}
-            {regList.length === 0 && !isLoading && (
-              <tr>
-                <td
-                  colSpan={3}
-                  className="text-center py-10 text-neutral-400 italic">
-                  Kaga ada pendaftar baru, sepi amat...
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </section>
-
       {/* SECTION 2: DAFTAR USER RESMI */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold flex items-center gap-2">
-            Semua Anggota
+            Semua Karyawan
           </h2>
           <Badge variant="success">{userList.length} Aktif</Badge>
         </div>

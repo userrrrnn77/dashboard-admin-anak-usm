@@ -8,6 +8,10 @@ export interface User<String = string> {
   imageProfile?: String;
 }
 
+// =============================
+// RUTE USER ATAU KARYAWAN
+// =============================
+
 export const createUser = (data: User) =>
   api.post<ResponseBre>("/user/createUser", data);
 
@@ -22,14 +26,17 @@ export const deleteUser = (id: string) =>
   api.delete<ResponseBre>(`/user/${id}`);
 
 // ==============================
-// REGISTRASI PENDAFTAR BRE
+// RUTE PENDAFTAR BRE
 // ==============================
 
 // acc pendaftar bre
 export const acceptedRegister = (id: string) =>
-  api.patch(`/registration/${id}`);
+  api.patch(`/registration/verify/${id}`);
 
 export const getAllRegistration = () => api.get<ResponseBre>("/registration");
 
 export const getRegistrationById = (id: string) =>
-  api.get<ResponseBre>(`/${id}`);
+  api.get<ResponseBre>(`/registration/${id}`);
+
+export const deleteRegistrationById = (id: string) =>
+  api.delete<ResponseBre>(`/registration/${id}`);

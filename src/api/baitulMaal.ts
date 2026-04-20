@@ -10,7 +10,7 @@ export interface CreateBaitulMaal {
   tagline?: string;
   description?: string;
   images?: string[];
-  publicIds: string[];
+  publicIds?: string[];
   videoUrl?: string[];
   features?: string[];
   category: "KESEHATAN" | "KEMANUSIAAN" | "SOSIAL";

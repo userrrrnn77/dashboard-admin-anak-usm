@@ -26,7 +26,7 @@ export const useBaitulMaal = (id?: string) => {
 
   // CREATE
   const createAction = useMutation({
-    mutationFn: createProgram,
+    mutationFn: (data: CreateBaitulMaal) => createProgram(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["baitul-maal"] });
       toast.success("Program baru meluncur!");
