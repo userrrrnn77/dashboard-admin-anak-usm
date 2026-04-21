@@ -4,7 +4,12 @@ import * as pkg from "react-helmet-async";
 
 const { Helmet } = pkg;
 
-const Title = ({ children  }) => {
+interface TitleProps {
+  children: string;
+}
+
+const Title = ({ children }: TitleProps) => {
+  // Binding element 'children' implicitly has an 'any' type.
   return (
     <Helmet>
       <title>{children}</title>
