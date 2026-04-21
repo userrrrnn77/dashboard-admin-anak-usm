@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useBaitulMaal } from "../hooks/useBaitulMaal";
-import { Table, THead } from "../components/ui/Table";
 import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
 import { Badge } from "../components/ui/Badge";
-import { Input } from "../components/ui/Input"; // Pake komponen lu, Bre!
+import { Input } from "../components/ui/Input"; 
 import type { CreateBaitulMaal } from "../api/baitulMaal";
 import { uploadToCloudinary } from "../utils/uploadCloudinary";
 import {
@@ -16,9 +15,10 @@ import {
   ListPlus,
   X,
   Video,
+  Box,
+  ChevronRight,
 } from "lucide-react";
 
-// Interface biar TS kaga tantrum
 interface BaitulMaalItem extends CreateBaitulMaal {
   id: string;
   images: string[];
@@ -53,7 +53,7 @@ const BaitulMaal = () => {
 
   const [features, setFeatures] = useState<string[]>([""]);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [selectedVideo, setSelectedVideo] = useState<File | null>(null); // State video baru
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
 
   const handleEdit = (program: BaitulMaalItem) => {
     setIsEditMode(true);
@@ -92,22 +92,17 @@ const BaitulMaal = () => {
     setIsSubmitting(true);
 
     try {
-      // 🔥 upload image
       const uploadedImages = await Promise.all(
         selectedImages.map((file) => uploadToCloudinary(file)),
       );
-
       const imageUrls = uploadedImages.map((res) => res.secure_url);
 
-      // 🔥 upload video
       let videoUrls: string[] = [];
-
       if (selectedVideo) {
         const uploadedVideo = await uploadToCloudinary(selectedVideo);
         videoUrls = [uploadedVideo.secure_url];
       }
 
-      // 🔥 payload JSON
       const payload = {
         id: formData.id,
         title: formData.title,
@@ -115,7 +110,7 @@ const BaitulMaal = () => {
         description: formData.description,
         category: formData.category,
         features: features.filter((f) => f.trim() !== ""),
-        images: imageUrls,
+        images: imageUrls.length > 0 ? imageUrls : formData.images, // Logic fallback image
         videoUrl: videoUrls,
       };
 
@@ -136,106 +131,78 @@ const BaitulMaal = () => {
   return (
     <div className="p-6 space-y-6">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2 text-neutral-900 dark:text-white">
-            <Heart className="text-red-500" size={28} fill="currentColor" />{" "}
-            Baitul Maal
-          </h1>
-          <p className="text-neutral-500 text-sm">
-            Dashboard Manajemen Program Sosial Mabes.
-          </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-rose-500 rounded-3xl shadow-lg shadow-rose-500/20 text-white">
+            <Heart size={32} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black uppercase tracking-tighter text-neutral-900 dark:text-white leading-none">
+              Mabes Baitul Maal
+            </h1>
+            <p className="text-neutral-500 text-sm font-medium mt-1">
+              Program sosial, kemanusiaan, & kesehatan terpadu.
+            </p>
+          </div>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="bg-emerald-600 hover:bg-emerald-700">
-          <Plus size={18} className="mr-2" /> Rilis Program
+          className="bg-neutral-900 dark:bg-rose-600 py-7 px-8 rounded-2xl shadow-xl transition-all active:scale-95">
+          <Plus size={20} className="mr-2" /> Rilis Program
         </Button>
       </div>
 
-      {/* FILTER */}
-      <div className="w-full md:w-80">
-        <Input
-          label=""
-          placeholder="Cari program donasi..."
-          className="pl-10"
-        />
+      {/* GRID LAYOUT (Baitul Maal Version) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-80 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-4xl" />
+          ))
+        ) : Array.isArray(programs) && programs.length > 0 ? (
+          programs.map((p: BaitulMaalItem) => (
+            <div key={p.id} className="group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-4xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+              {/* Image Preview */}
+              <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
+                <img src={p.images?.[0]} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+                <div className="absolute top-4 right-4">
+                  <Badge variant={p.category === "SOSIAL" ? "success" : "info"}>{p.category}</Badge>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-[10px] font-mono text-neutral-400 mb-1">ID: {p.id}</p>
+                <h3 className="font-black text-lg uppercase tracking-tight text-neutral-800 dark:text-white truncate">{p.title}</h3>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 mt-2 leading-relaxed">
+                  {p.tagline || p.description}
+                </p>
+
+                {/* Actions Grid Style */}
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-neutral-50 dark:border-neutral-800">
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="ghost" className="rounded-xl bg-neutral-50 dark:bg-neutral-800" onClick={() => handleEdit(p)}>
+                      <Edit3 size={16} />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="rounded-xl bg-red-50 dark:bg-red-900/10 text-red-500" onClick={() => deleteProgram(p.id)}>
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                  <button className="flex items-center gap-1 text-[10px] font-black uppercase text-rose-600 hover:gap-2 transition-all">
+                    Lihat Program <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full p-20 text-center border-2 border-dashed border-neutral-200 rounded-[3rem]">
+            <Box size={48} className="mx-auto text-neutral-300 mb-4" />
+            <p className="text-neutral-400 font-bold">Data kosong melompong, Bre!</p>
+          </div>
+        )}
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm">
-        <Table>
-          <THead>
-            <tr>
-              <th className="px-6 py-4 text-left">Program</th>
-              <th className="px-6 py-4 text-left">Kategori</th>
-              <th className="px-6 py-4 text-right">Aksi</th>
-            </tr>
-          </THead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            {isLoading ? (
-              <tr>
-                <td
-                  colSpan={3}
-                  className="p-20 text-center animate-pulse text-neutral-400 italic">
-                  Lagi narik data dari database Bun... 🚬
-                </td>
-              </tr>
-            ) : Array.isArray(programs) && programs.length > 0 ? (
-              programs.map((p: BaitulMaalItem) => (
-                <tr
-                  key={p.id}
-                  className="hover:bg-neutral-50/50 transition-colors">
-                  <td className="px-6 py-4 text-left">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={p.images?.[0]}
-                        className="w-10 h-10 rounded-xl object-cover"
-                        alt=""
-                      />
-                      <div>
-                        <p className="font-bold text-sm text-neutral-800 dark:text-neutral-200 leading-none">
-                          {p.title}
-                        </p>
-                        <span className="text-[10px] text-neutral-400 font-mono">
-                          ID: {p.id}
-                        </span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-left">
-                    <Badge>{p.category}</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(p)}>
-                        <Edit3 size={16} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => deleteProgram(p.id)}>
-                        <Trash2 size={16} className="text-red-500" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={3} className="p-20 text-center text-neutral-400">
-                  Belum ada data, Bre.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
-
-      {/* MODAL CRUD */}
+      {/* MODAL CRUD (Logic Tetap) */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -307,7 +274,6 @@ const BaitulMaal = () => {
             />
           </div>
 
-          {/* DYNAMIC FEATURES */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
@@ -346,83 +312,49 @@ const BaitulMaal = () => {
             ))}
           </div>
 
-          {/* UPLOAD */}
           <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
-              <ImageIcon size={16} /> Media Program
+              <ImageIcon size={16} /> Foto Program (Multi)
             </label>
-            <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
-              <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
-                <ImageIcon size={16} /> Foto Program (Multi)
-              </label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                className="text-[10px] w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-emerald-50 file:text-emerald-700"
-                onChange={(e) =>
-                  setSelectedImages(Array.from(e.target.files || []))
-                }
-              />
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              className="text-[10px] w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-emerald-50 file:text-emerald-700"
+              onChange={(e) =>
+                setSelectedImages(Array.from(e.target.files || []))
+              }
+            />
 
-              {selectedImages.length > 0 && (
-                <div className="mt-2 space-y-2">
-                  <p className="text-[10px] font-bold text-emerald-600 uppercase">
-                    Preview Foto Baru:
-                  </p>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {selectedImages.map((file, idx) => (
-                      <img
-                        key={idx}
-                        src={URL.createObjectURL(file)}
-                        className="w-16 h-16 object-cover rounded-lg border-2 border-emerald-500"
-                        alt="New Preview"
-                      />
-                    ))}
-                  </div>
+            {selectedImages.length > 0 && (
+              <div className="mt-2 space-y-2">
+                <p className="text-[10px] font-bold text-emerald-600 uppercase">
+                  Preview Foto Baru:
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {selectedImages.map((file, idx) => (
+                    <img
+                      key={idx}
+                      src={URL.createObjectURL(file)}
+                      className="w-16 h-16 object-cover rounded-lg border-2 border-emerald-500"
+                      alt="New Preview"
+                    />
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
 
-            {/* INPUT VIDEO (OPSIONAL) */}
-            <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
-              <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
-                <Video size={16} className="text-blue-500" /> Video Program
-                (Opsional)
-              </label>
-              <input
-                type="file"
-                accept="video/*"
-                className="text-[10px] w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700"
-                onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-              />
-            </div>
-            {/* Preview Foto dari Database */}
-            {isEditMode &&
-              formData.images.length > 0 &&
-              !selectedImages.length && (
-                <div className="mt-3">
-                  <p className="text-[10px] font-bold text-neutral-400 mb-2 uppercase">
-                    Foto Aktif di Database:
-                  </p>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {formData.images.map((imgUrl, idx) => (
-                      <div key={idx} className="relative group">
-                        <img
-                          src={imgUrl}
-                          className="w-20 h-20 object-cover rounded-xl border border-neutral-200 shadow-sm"
-                          alt="Data Fetch"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                          <span className="text-[8px] text-white font-bold">
-                            LAMA
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
+              <Video size={16} className="text-blue-500" /> Video Program (Opsional)
+            </label>
+            <input
+              type="file"
+              accept="video/*"
+              className="text-[10px] w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700"
+              onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+            />
           </div>
 
           <Button

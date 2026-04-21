@@ -58,5 +58,6 @@ export default api;
 export interface ResponseBre<T = unknown> {
   success: boolean;
   message: string;
+  user: T;
   data?: T;
 }

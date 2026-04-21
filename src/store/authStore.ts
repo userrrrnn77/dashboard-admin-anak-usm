@@ -2,10 +2,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface UserProfile {
+  _id: string;
   name: string;
   phone: string;
   role: string;
   imageProfile?: string;
+  password: string;
 }
 
 interface AuthState {

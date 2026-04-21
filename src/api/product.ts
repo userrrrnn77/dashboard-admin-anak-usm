@@ -6,6 +6,7 @@ export const getProductFullById = (id: string) =>
   api.get(`/product/full/${id}`);
 
 export interface product {
+  id?: string
   title?: string;
   fullTitle?: string;
   desc?: string;
@@ -19,7 +20,7 @@ export const createProduct = (data: product) =>
   api.post<ResponseBre>("/product", data);
 
 export const updateProduct = (id: string, data: Partial<product>) =>
-  api.post<ResponseBre>(`/product/${id}`, data);
+  api.patch<ResponseBre>(`/product/${id}`, data);
 
 export const deleteProduct = (id: string) =>
   api.delete<ResponseBre>(`/product/${id}`);

@@ -7,6 +7,9 @@ import {
   getAllRegistration,
   getRegistrationById,
   deleteRegistrationById,
+  updateUser, // tolong tambahin dua ini bre
+  createUser,
+  type User, // tolong tambahin dua ini bre
 } from "../api/user";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -99,6 +102,36 @@ export const useUser = (userId?: string, registrationId?: string) => {
   });
 
   // --- 3. MUTATIONS (ACTIONS) ---
+  // 🚀 CREATE USER
+  const createAction = useMutation({
+    mutationFn: (data: User) => createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("User baru resmi mendarat!");
+    },
+    onError: (err: unknown) => {
+      const error = err as AxiosError<ErrorResponse>;
+      toast.error(error.response?.data?.message || "Gagal bikin user baru!");
+    },
+  });
+
+  // 🪄 UPDATE USER
+  const updateAction = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<User> }) => // The expected type comes from property 'data' which is declared here on type '{ id: string; data: User<string>; }'
+    // udah gw gituin masih gitu bre anjir
+      updateUser(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ["users", userId] });
+      }
+      toast.success("Data user berhasil dipoles!");
+    },
+    onError: (err: unknown) => {
+      const error = err as AxiosError<ErrorResponse>;
+      toast.error(error.response?.data?.message || "Gagal update data user!");
+    },
+  });
 
   const deleteAction = useMutation({
     mutationFn: (id: string) => deleteUser(id),
@@ -164,12 +197,16 @@ export const useUser = (userId?: string, registrationId?: string) => {
     // Status
     isLoading: usersQuery.isLoading || registrationsQuery.isLoading,
     isDetailLoading: userDetailQuery.isLoading || regDetailQuery.isLoading,
+    isCreating: createAction.isPending,
+    isUpdating: updateAction.isPending,
+    isDeleting: deleteAction.isPending,
+    isApproving: approveAction.isPending,
 
     // Actions
+    createUser: createAction.mutateAsync, // Pake Async biar lu bisa handle .then() di form
+    updateUser: updateAction.mutateAsync,
     deleteRegistration: deleteRegistration.mutate,
     deleteUser: deleteAction.mutate,
     approveUser: approveAction.mutate,
-    isDeleting: deleteAction.isPending,
-    isApproving: approveAction.isPending,
   };
 };

@@ -6,6 +6,7 @@ export interface ISection {
 }
 
 export interface productDetail {
+  id?: string;
   title?: string;
   description?: string;
   sections?: ISection[];

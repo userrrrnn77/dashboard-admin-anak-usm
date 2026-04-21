@@ -1,5 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAllGallery, deleteGallery, createGallery } from "../api/gallery";
+import {
+  getAllGallery,
+  deleteGallery,
+  createGallery,
+  type gallery,
+} from "../api/gallery";
 import { toast } from "sonner";
 
 export const useGallery = () => {
@@ -9,6 +14,8 @@ export const useGallery = () => {
     queryKey: ["gallery"],
     queryFn: getAllGallery,
   });
+
+  const images = (data?.data?.data as gallery[]) || [];
 
   const createAction = useMutation({
     mutationFn: createGallery,
@@ -27,7 +34,7 @@ export const useGallery = () => {
   });
 
   return {
-    images: data?.data?.data || [],
+    images: images,
     isLoading,
     addPhoto: createAction.mutateAsync,
     deleteImage: deleteAction.mutate,

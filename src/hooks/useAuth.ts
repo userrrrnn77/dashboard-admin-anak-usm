@@ -15,6 +15,19 @@ interface LoginPayload {
   password: string;
 }
 
+interface GetMeResponse {
+  success: boolean;
+  user: {
+    _id: string;
+    id?: string;
+    name: string;
+    phone: string;
+    role: string;
+    imageProfile?: string;
+    [key: string]: unknown; // Jaga-jaga kalo ada field lain dari backend
+  };
+}
+
 interface RegisterPayload {
   name: string;
   phone: string;
@@ -90,17 +103,23 @@ export const useAuth = () => {
   // 3. FETCH ME (SINKRONISASI PROFIL)
   const fetchMe = useCallback(async () => {
     try {
-      const { data } = await getMeapi();
-      if (data.success) {
-        // Update user di store
-        setuser(data.data as UserProfile);
+      // Kasih tau TS kalau 'data' itu bentuknya GetMeResponse
+      const response = await getMeapi();
+      const data = response.data as GetMeResponse;
+
+      console.log("🔥 DATA DARI API GETME:", data);
+
+      if (data.success && data.user) {
+        setuser({
+          ...data.user,
+          // Sekarang TS kaga bakal protes lagi karena _id udah ada di GetMeResponse
+          _id: data.user._id || data.user.id || "",
+        } as UserProfile);
       }
     } catch (err) {
-      // Kalo token expired atau error, langsung tendang ke login
-      console.error("Session expired, Bre:", err);
-      clearauth();
+      console.error("Gagal sinkron, Bre:", err);
     }
-  }, [setuser, clearauth]);
+  }, [setuser]);
 
   // 4. LOGOUT ACTION
   const logoutAction = async (): Promise<void> => {

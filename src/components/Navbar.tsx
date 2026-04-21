@@ -1,6 +1,7 @@
 import { useThemeStore } from "../store/themeStore";
 import { useAuthStore } from "../store/authStore";
 import { Moon, Sun, Bell } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 export const Navbar = () => {
   const { isDarkMode, toggleTheme } = useThemeStore();
@@ -29,14 +30,16 @@ export const Navbar = () => {
         </button>
 
         <div className="flex items-center gap-3 pl-4 border-l border-neutral-200 dark:border-neutral-700">
-          <img
-            src={
-              user?.imageProfile ||
-              "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-            }
-            alt="profile"
-            className="w-8 h-8 rounded-full bg-emerald-100"
-          />
+          <NavLink to={"/profile"}>
+            <img
+              src={
+                user?.imageProfile ||
+                "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+              }
+              alt="profile"
+              className="w-8 h-8 rounded-full bg-emerald-100 object-cover"
+            />
+          </NavLink>
         </div>
       </div>
     </header>

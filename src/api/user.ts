@@ -1,11 +1,12 @@
 import api, { type ResponseBre } from "./axios";
 
-export interface User<String = string> {
-  name?: String;
-  phone?: String;
-  password?: String;
-  role: String;
-  imageProfile?: String;
+export interface User {
+  _id:string;
+  name?: string;
+  phone?: string;
+  password?: string;
+  role: string;
+  imageProfile?: string;
 }
 
 // =============================

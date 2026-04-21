@@ -18,6 +18,9 @@ import { useEffect } from "react";
 import RegisterUser from "./pages/RegisterUser";
 import BaitulMaal from "./pages/BaitulMaal";
 import UsersPage from "./pages/Users";
+import Products from "./pages/Products";
+import Gallery from "./pages/Gallery";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +56,9 @@ const App = () => {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/register" element={<RegisterUser />} />
             <Route path="/baitul-maal" element={<BaitulMaal />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
 
           {/* 404 */}

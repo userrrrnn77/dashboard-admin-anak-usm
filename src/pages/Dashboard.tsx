@@ -5,12 +5,15 @@ import { Users, HeartHandshake, Package, UserCheck } from "lucide-react";
 // Import interface pendaftar buat ngilangin 'any' di map
 import { type User } from "../api/user";
 import { type CreateBaitulMaal } from "../api/baitulMaal";
+import { useProduct } from "../hooks/useProduct";
 
 const Dashboard = () => {
   // Casting manual di sini biar TS kaga pusing pas panggil .length
   const { users, registrations, isLoading: userLoading } = useUser();
 
   const { programs, isLoading: programLoading } = useBaitulMaal();
+
+  const {products} = useProduct()
 
   const isLoading = userLoading || programLoading;
 
@@ -30,15 +33,15 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Total User"
+          title="Total Admin"
           value={isLoading ? "..." : userList.length}
           icon={<Users size={24} />}
-          trend="+5% dr minggu lalu"
-        />
+          />
         <StatCard
           title="Pendaftar Baru"
           value={isLoading ? "..." : regList.length}
           icon={<UserCheck size={24} />}
+          trend="+5% dr minggu lalu"
         />
         <StatCard
           title="Program Aktif"
@@ -47,7 +50,7 @@ const Dashboard = () => {
         />
         <StatCard
           title="Total Produk"
-          value="12"
+          value={isLoading ? "...": products.length} // Property 'length' does not exist on type '{}'.
           icon={<Package size={24} />}
         />
       </div>
