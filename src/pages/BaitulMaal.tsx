@@ -18,6 +18,7 @@ import {
   Box,
   ChevronRight,
 } from "lucide-react";
+import Title from "../components/common/Title";
 
 interface BaitulMaalItem extends CreateBaitulMaal {
   id: string;
@@ -130,6 +131,9 @@ const BaitulMaal = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <Title>
+        Baitul Maal | Dashboard Admin
+      </Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
         <div className="flex items-center gap-4">

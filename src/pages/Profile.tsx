@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "../api/user";
+import Title from "../components/common/Title";
 
 const Profile = () => {
   const { user, logoutAction, fetchMe } = useAuth();
@@ -117,6 +118,9 @@ const Profile = () => {
 
   return (
     <div key={userId} className="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
+        <Title>
+        Profile | Dashboard Admin
+      </Title>
       <input
         type="file"
         ref={fileInputRef}

@@ -5,6 +5,7 @@ import { Input } from "../components/ui/Input";
 // import { Select } from "../components/ui/Select";
 import { Button } from "../components/ui/Button";
 import { UserPlus, ArrowLeft } from "lucide-react";
+import Title from "../components/common/Title";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 p-6">
       <div className="w-full max-w-md space-y-8 bg-white dark:bg-neutral-900 p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
+      <Title>
+        Regitrasi User | Dashboard Admin
+      </Title>
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 mb-4">

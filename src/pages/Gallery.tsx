@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { gallery as IGallery } from "../api/gallery";
 import { Badge } from "../components/ui/Badge";
+import Title from "../components/common/Title";
 
 const Gallery = () => {
   const { images, isLoading, addPhoto, deleteImage } = useGallery();
@@ -69,6 +70,7 @@ const Gallery = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <Title>Gallery | Dashboard Admin</Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
         <div className="flex items-center gap-4">

@@ -6,6 +6,7 @@ import { Users, HeartHandshake, Package, UserCheck } from "lucide-react";
 import { type User } from "../api/user";
 import { type CreateBaitulMaal } from "../api/baitulMaal";
 import { useProduct } from "../hooks/useProduct";
+import Title from "../components/common/Title";
 
 const Dashboard = () => {
   // Casting manual di sini biar TS kaga pusing pas panggil .length
@@ -24,6 +25,9 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
+      <Title>
+        Dashboard Admin | Mitra Hasanah
+      </Title>
       <div>
         <h1 className="text-2xl font-bold">Dashboard Overview</h1>
         <p className="text-neutral-500 text-sm">

@@ -1,73 +1,20 @@
-# React + TypeScript + Vite
+# 🚀 Mitra Hasanah - Admin Dashboard Wizard v1.0
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dashboard kendali pusat buat ekosistem **Mitra Hasanah**. Dibuat dengan penuh emosi, kopi, dan begadang sampai subuh. Kodingan ini bukan buat orang lemah yang cuma main *low-code*.
 
-Currently, two official plugins are available:
+## 🛠️ Tech Stack (The Wizard's Tools)
+- **Frontend:** React + Vite (Fast as f*ck)
+- **Styling:** Tailwind CSS (Biar ganteng maksimal)
+- **State Management:** React Context / Zustand (Tergantung mood)
+- **Language:** TypeScript (Biar kaga kena jebakan `undefined` jembot)
+- **API Gateway:** Terkoneksi ke Backend Wizard (Node.js/Bun + Mongoose)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ⚡ Fitur Utama
+- **Dashboard Overview:** Statistik data produk ama user secara real-time.
+- **Product Management:** CRUD produk kaga pake ribet, lengkap ama upload gambar ke Cloudinary.
+- **Gallery Control:** Atur dokumentasi event biar makin pro.
+- **Auth Guard:** Login ketat, kaga level buat hacker amatir tembus sini.
+- **Responsive Design:** Bisa lu pantau dari Axioo lu atau sambil rebahan pake HP.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🏃‍♂️ Cara Running (Local Mode)
+Pastiin lu udah instal **Bun** atau **Node.js** (tapi saran gue pake Bun biar kenceng).

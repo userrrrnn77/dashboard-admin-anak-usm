@@ -14,6 +14,7 @@ import {
   Users,
   Clock,
 } from "lucide-react";
+import Title from "../components/common/Title";
 
 const RegisterUser = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -57,6 +58,9 @@ const RegisterUser = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <Title>
+        Register ACC | Dashboard Admin
+      </Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

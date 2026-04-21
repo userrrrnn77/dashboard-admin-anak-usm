@@ -7,6 +7,7 @@ import { Modal } from "../components/ui/Modal";
 import { Trash2, Eye, Phone, Shield, User as UserIcon } from "lucide-react";
 import { type User } from "../api/user";
 import Swal from "sweetalert2";
+import Title from "../components/common/Title";
 
 const UsersPage = () => {
   const { users, deleteUser, isDeleting } = useUser();
@@ -40,6 +41,7 @@ const UsersPage = () => {
 
   return (
     <div className="space-y-10">
+      <Title>Manajemen Admin | Dashboard Admin</Title>
       {/* SECTION 2: DAFTAR USER RESMI */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
