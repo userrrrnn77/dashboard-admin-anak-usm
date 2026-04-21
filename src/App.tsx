@@ -21,6 +21,7 @@ import UsersPage from "./pages/Users";
 import Products from "./pages/Products";
 import Gallery from "./pages/Gallery";
 import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -62,7 +63,7 @@ const App = () => {
           </Route>
 
           {/* 404 */}
-          <Route path="*" element={<div>Nyasar lu, Bre!</div>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         <Toaster richColors position="top-right" />
