@@ -22,6 +22,7 @@ import Products from "./pages/Products";
 import Gallery from "./pages/Gallery";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Carousel from "./pages/Carousel";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => {
             <Route path="/products" element={<Products />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/carousel" element={<Carousel />} />
           </Route>
 
           {/* 404 */}

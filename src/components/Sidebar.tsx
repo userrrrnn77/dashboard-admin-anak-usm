@@ -7,6 +7,8 @@ import {
   HeartHandshake,
   LogOut,
   UserRoundCheck,
+  
+  GalleryHorizontal,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -14,6 +16,7 @@ const menuItems = [
   { name: "Dashboard", path: "/", icon: LayoutDashboard },
   { name: "Manajemen Admin", path: "/users", icon: Users },
   { name: "Pendaftaran", path: "/register", icon: UserRoundCheck },
+  { name: "Carousel", path: "/carousel", icon: GalleryHorizontal },
   { name: "Program Baitul Maal", path: "/baitul-maal", icon: HeartHandshake },
   { name: "Produk", path: "/products", icon: Package },
   { name: "Galeri Kegiatan", path: "/gallery", icon: ImageIcon },

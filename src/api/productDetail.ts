@@ -19,7 +19,7 @@ export const createProductDetail = (data: productDetail) =>
   api.post("/product-detail", data);
 
 export const updateProductDetail = (id: string, data: Partial<productDetail>) =>
-  api.post<ResponseBre>(`/product-detail/${id}`, data);
+  api.patch<ResponseBre>(`/product-detail/${id}`, data);
 
 export const deleteProductDetail = (id: string) =>
   api.delete<ResponseBre>(`/product-detail/${id}`);

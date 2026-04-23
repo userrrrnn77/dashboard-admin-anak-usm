@@ -20,8 +20,11 @@ import {
 } from "lucide-react";
 
 import type { product as IProduct } from "../api/product";
-import type { productDetail as IProductDetail } from "../api/productDetail";
+import { type productDetail as IProductDetail } from "../api/productDetail";
 import Title from "../components/common/Title";
+import { toast } from "sonner";
+import Swal from "sweetalert2";
+import { useThemeStore } from "../store/themeStore";
 
 const Products = () => {
   const {
@@ -32,7 +35,10 @@ const Products = () => {
     updateProduct,
     deleteProduct,
     createDetail,
+    updateDetail,
   } = useProduct();
+
+  const { isDarkMode } = useThemeStore();
 
   // --- UI STATES ---
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -143,7 +149,8 @@ const Products = () => {
 
         if (isEditMode && selectedProduct?.id) {
           await updateProduct({ id: selectedProduct.id, data: payload });
-          setIsFormOpen(false); // Kalau edit, biasanya cuma ganti katalog
+          setStep(2);
+          toast.success("Katalog aman, gas update jeroannya!");
         } else {
           await createProduct(payload);
           // Auto-set detail title & pindah step
@@ -154,23 +161,58 @@ const Products = () => {
           setStep(2);
         }
       } else {
-        // --- PROSES JEROAN (DETAIL) ---
-        // ID Detail harus sama dengan ID Produk (Slug)
-        const detailPayload = { ...detailData, id: formData.id };
-        await createDetail(detailPayload);
+        const finalPayload = {
+          id: formData.id || "",
+          title: detailData.title || formData.fullTitle || "",
+          description: detailData.description || "",
+          sections: (detailData.sections || [])
+            .map((sec) => ({
+              subtitle: sec.subtitle,
+              items: sec.items.filter((item) => item.trim() !== ""),
+            }))
+            .filter((sec) => sec.subtitle.trim() !== ""),
+        };
+
+        // 2. Eksekusi sesuai mode
+        if (isEditMode) {
+          // Edit pake PATCH (sesuai request lu tadi, Wizard!)
+          await updateDetail({ id: String(formData.id), data: finalPayload });
+          toast.success("Jeroan berhasil di-PATCH, Bre! 🪄");
+        } else {
+          // Barang baru pake POST
+          await createDetail(finalPayload); // <--- Pake finalPayload juga di sini, bgsd!
+          toast.success("Barang rilis sempurna, Bre! 🚀");
+        }
+
         setIsFormOpen(false);
         setStep(1);
+        toast.success("Barang rilis sempurna, Bre! 🚀");
       }
     } catch (err) {
       console.error("Gagal rilis barang, Bre!", err);
     }
   };
 
+  const confirmDelete = (id: string) => {
+    Swal.fire({
+      title: "Yakin dibuang, Bre?",
+      text: "Data ini bakal ilang selamanya!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Iya, Hapus!",
+      cancelButtonText: "Batal, Mbot",
+      theme: isDarkMode ? "dark" : "light", //  gini kan enak bre
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // 🚀 BARU PANGGIL MUTATE DI SINI!
+        deleteProduct(id);
+      }
+    });
+  };
+
   return (
     <div className="p-6 space-y-6">
-        <Title>
-        Products | Dashboard Admin
-      </Title>
+      <Title>Products | Dashboard Admin</Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
         <div className="flex items-center gap-4">
@@ -196,14 +238,14 @@ const Products = () => {
       {/* LIST DATA */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
+          Array.from({ length: products.length || 5 }).map((_, i) => (
             <div
               key={i}
               className="h-64 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-4xl"
             />
           ))
         ) : Array.isArray(products) && products.length > 0 ? (
-          products.map((p: IProduct) => (
+          products.reverse().map((p: IProduct) => (
             <div
               key={p.id}
               className="group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-4xl overflow-hidden hover:shadow-2xl transition-all duration-300">
@@ -240,7 +282,7 @@ const Products = () => {
                       size="sm"
                       variant="ghost"
                       className="rounded-xl text-red-500"
-                      onClick={() => p.id && deleteProduct(p.id)}>
+                      onClick={() => p.id && confirmDelete(p.id)}>
                       <Trash2 size={16} />
                     </Button>
                   </div>
@@ -473,9 +515,10 @@ const Products = () => {
                 "{selectedProduct.desc || "No description."}"
               </p>
             </div>
+
             <Button
               onClick={() => setIsDetailOpen(false)}
-              variant="ghost"
+              variant="outline"
               className="w-full">
               Tutup Overview
             </Button>

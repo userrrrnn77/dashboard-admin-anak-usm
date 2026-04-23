@@ -1,24 +1,19 @@
 import { useState } from "react";
-import { useGallery } from "../hooks/useGallery";
 import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
 import { uploadToCloudinary } from "../utils/uploadCloudinary";
-import {
-  Plus,
-  Trash2,
-  Image as ImageIcon,
-  Maximize2,
-  Camera,
-  X,
-} from "lucide-react";
-import type { gallery as IGallery } from "../api/gallery";
+import { Plus, Trash2, Maximize2, X, Images, ImageIcon } from "lucide-react";
 import { Badge } from "../components/ui/Badge";
 import Title from "../components/common/Title";
 import Swal from "sweetalert2";
 import { useThemeStore } from "../store/themeStore";
+import { useCarousel } from "../hooks/useCarousel";
+import type { ICarousel } from "../api/carousel";
+import { Input } from "../components/ui/Input";
+import { toast } from "sonner";
 
-const Gallery = () => {
-  const { images, isLoading, addPhoto, deleteImage } = useGallery();
+const Carousel = () => {
+  const { carousels, isLoading, addCarousel, deleteCarousel } = useCarousel();
 
   const { isDarkMode } = useThemeStore();
 
@@ -26,6 +21,7 @@ const Gallery = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
 
   // State buat handle file yang mau diupload
   const [tempFiles, setTempFiles] = useState<File[]>([]);
@@ -40,28 +36,37 @@ const Gallery = () => {
 
   const handleUpload = async () => {
     if (tempFiles.length === 0) return;
+    if (!title)
+      return Swal.fire({
+        title: "PAOK LU!",
+        text: "NAMANYA ISI DULU BRE ANJAY!",
+        icon: "warning",
+        confirmButtonText: "oke bre siap..",
+      });
 
     setIsUploading(true);
     try {
-      const uploadedImages = [];
-
-      // 1. Looping upload ke Cloudinary satu-satu
+      // 1. Looping upload ke Cloudinary & simpan ke DB SATU-SATU
       for (const file of tempFiles) {
+        // Upload ke Cloudinary
         const res = await uploadToCloudinary(file);
-        uploadedImages.push({
-          src: res.secure_url,
+
+        const payload = {
+          title: title.trim(), // Pastiin kaga kosong
+          image: res.secure_url,
           publicId: res.public_id,
-          caption: file.name.split(".")[0], // Default caption dari nama file
-        });
+        };
+
+        console.log("NEMBAK DATA INI BRE:", payload);
+        
+        await addCarousel(payload);
       }
 
-      // 2. Setor JSON array ke Backend
-      await addPhoto({ images: uploadedImages } as IGallery);
-
-      setIsUploadOpen(false);
-      setTempFiles([]);
+      toast.success("Semua foto berhasil mendarat di Galeri! 🚀");
+      handleCancelUpload(); // Pake fungsi cancel biar bersih semua state-nya
     } catch (err) {
-      console.error("Gagal nyetor foto ke galeri, Bre!", err);
+      console.error("Gagal nyetor foto ke carousel, Bre!", err);
+      toast.error("Ada yang nyangkut pas upload, cek koneksi lu!");
     } finally {
       setIsUploading(false);
     }
@@ -84,27 +89,44 @@ const Gallery = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // 🚀 BARU PANGGIL MUTATE DI SINI!
-        deleteImage(id);
+        deleteCarousel(id);
       }
     });
   };
 
+  const handleCancelUpload = () => {
+    // 1. Bersihin Preview (Revoke URL biar memori kaga bocor)
+    tempFiles.forEach((file) => {
+      const url = URL.createObjectURL(file);
+      URL.revokeObjectURL(url);
+    });
+
+    // 2. Kosongin State
+    setTempFiles([]);
+    setTitle(""); // Reset judul juga, bgsd!
+
+    // 3. Tutup Modal
+    setIsUploadOpen(false);
+
+    toast.info("Gajadi upload? Lemah lu, Bre! 🤣");
+  };
+
   return (
     <div className="p-6 space-y-6">
-      <Title>Gallery | Dashboard Admin</Title>
+      <Title>Carousel | Dashboard Admin</Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-4 bg-indigo-500 rounded-3xl shadow-lg shadow-indigo-500/20 text-white">
-            <Camera size={32} />
+            <Images size={32} />
           </div>
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter text-neutral-900 dark:text-white leading-none">
-              Mabes Dokumentasi
+              Mabes Carousel
             </h1>
             <p className="text-neutral-500 text-sm font-medium mt-1">
               {
-                images.length
+                carousels.length
                 //   Property 'length' does not exist on type '{}'.
               }{" "}
               Foto kenangan tersimpan.
@@ -128,21 +150,21 @@ const Gallery = () => {
               />
             ))
           : // Pake interface IGallery (yang lu dapet dari import gallery)
-            (images as IGallery[]).map((img: IGallery, index: number) => (
+            (carousels as ICarousel[]).map((img: ICarousel, index: number) => (
               <div
                 key={img.publicId || index} // Pake publicId atau index biar kaga rewel key-nya
                 className="group relative aspect-square bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
                 <img
-                  src={img.src}
+                  src={img.image}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  alt={img.alt || "Dokumentasi KSPPS"}
+                  alt={img.title || "Dokumentasi KSPPS"}
                 />
 
                 {/* OVERLAY ACTIONS */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
                   <Button
                     type="button"
-                    onClick={() => img.src && openPreview(img.src)}
+                    onClick={() => img.image && openPreview(img.image)}
                     className="p-3 bg-white/20 hover:bg-white/40 text-white rounded-2xl transition-all">
                     <Maximize2 size={20} />
                   </Button>
@@ -168,7 +190,7 @@ const Gallery = () => {
           <div className="p-8 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-4xl bg-neutral-50/50 flex flex-col items-center justify-center text-center">
             <ImageIcon size={48} className="text-neutral-300 mb-4" />
             <p className="text-sm font-bold text-neutral-500 mb-4">
-              Pilih foto kegiatan KSPPS (Bisa banyak sekaligus)
+              Pilih foto untuk dijadikan slide website (Maks 10 gambar)
             </p>
             <input
               type="file"
@@ -178,6 +200,33 @@ const Gallery = () => {
               onChange={handleFileChange}
             />
           </div>
+
+          <Input
+            label="Masukan Namanya bre"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          {tempFiles.length > 0 && (
+            <div className="grid grid-cols-3 gap-3">
+              {tempFiles.map((file, index) => (
+                <div
+                  key={index}
+                  className="relative aspect-video rounded-2xl overflow-hidden group border dark:border-neutral-800">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="preview"
+                    className="object-cover w-full h-full"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <p className="text-[8px] text-white font-bold truncate px-2">
+                      {file.name}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {tempFiles.length > 0 && (
             <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
@@ -194,12 +243,22 @@ const Gallery = () => {
             </div>
           )}
 
-          <Button
-            onClick={handleUpload}
-            className="w-full py-7 bg-indigo-600 rounded-2xl"
-            isLoading={isUploading}>
-            {isUploading ? "Lagi nembak Cloudinary..." : "Masukin Galeri 🚀"}
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="danger" // Pake ghost biar kaga norak
+              className="flex-1 py-7 rounded-2xl border-2 border-neutral-200 dark:border-neutral-800"
+              onClick={handleCancelUpload}
+              disabled={isUploading}>
+              Batal
+            </Button>
+
+            <Button
+              onClick={handleUpload}
+              className="flex-2 py-7 bg-indigo-600 rounded-2xl"
+              isLoading={isUploading}>
+              {isUploading ? "Nembak Cloudinary..." : "Masukin Galeri"}
+            </Button>
+          </div>
         </div>
       </Modal>
 
@@ -222,4 +281,4 @@ const Gallery = () => {
   );
 };
 
-export default Gallery;
+export default Carousel;

@@ -101,7 +101,7 @@ export const useProduct = (productId?: string) => {
 
   return {
     // --- Data ---
-    products: productsQuery.data?.data?.data as product[] || [],
+    products: (productsQuery.data?.data?.data as product[]) || [],
     productDetail: detailQuery.data?.data?.data || null,
 
     // --- Status ---

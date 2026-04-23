@@ -3,7 +3,7 @@ import { useBaitulMaal } from "../hooks/useBaitulMaal";
 import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
 import { Badge } from "../components/ui/Badge";
-import { Input } from "../components/ui/Input"; 
+import { Input } from "../components/ui/Input";
 import type { CreateBaitulMaal } from "../api/baitulMaal";
 import { uploadToCloudinary } from "../utils/uploadCloudinary";
 import {
@@ -19,6 +19,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Title from "../components/common/Title";
+import Swal from "sweetalert2";
+import { useThemeStore } from "../store/themeStore";
 
 interface BaitulMaalItem extends CreateBaitulMaal {
   id: string;
@@ -129,11 +131,28 @@ const BaitulMaal = () => {
     }
   };
 
+  const { isDarkMode } = useThemeStore();
+
+  const confirmDelete = (id: string) => {
+    Swal.fire({
+      title: "Yakin dibuang, Bre?",
+      text: "Data ini bakal ilang selamanya!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hapus!",
+      cancelButtonText: "Batal",
+      theme: isDarkMode ? "dark" : "light", //  gini kan enak bre
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // 🚀 BARU PANGGIL MUTATE DI SINI!
+        deleteProgram(id);
+      }
+    });
+  };
+
   return (
     <div className="p-6 space-y-6">
-      <Title>
-        Baitul Maal | Dashboard Admin
-      </Title>
+      <Title>Baitul Maal | Dashboard Admin</Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
         <div className="flex items-center gap-4">
@@ -160,23 +179,38 @@ const BaitulMaal = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-80 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-4xl" />
+            <div
+              key={i}
+              className="h-80 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-4xl"
+            />
           ))
         ) : Array.isArray(programs) && programs.length > 0 ? (
           programs.map((p: BaitulMaalItem) => (
-            <div key={p.id} className="group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-4xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+            <div
+              key={p.id}
+              className="group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-4xl overflow-hidden hover:shadow-2xl transition-all duration-300">
               {/* Image Preview */}
               <div className="aspect-video w-full overflow-hidden bg-neutral-100 relative">
-                <img src={p.images?.[0]} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+                <img
+                  src={p.images?.[0]}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  alt=""
+                />
                 <div className="absolute top-4 right-4">
-                  <Badge variant={p.category === "SOSIAL" ? "success" : "info"}>{p.category}</Badge>
+                  <Badge variant={p.category === "SOSIAL" ? "success" : "info"}>
+                    {p.category}
+                  </Badge>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6">
-                <p className="text-[10px] font-mono text-neutral-400 mb-1">ID: {p.id}</p>
-                <h3 className="font-black text-lg uppercase tracking-tight text-neutral-800 dark:text-white truncate">{p.title}</h3>
+                <p className="text-[10px] font-mono text-neutral-400 mb-1">
+                  ID: {p.id}
+                </p>
+                <h3 className="font-black text-lg uppercase tracking-tight text-neutral-800 dark:text-white truncate">
+                  {p.title}
+                </h3>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 mt-2 leading-relaxed">
                   {p.tagline || p.description}
                 </p>
@@ -184,10 +218,18 @@ const BaitulMaal = () => {
                 {/* Actions Grid Style */}
                 <div className="flex items-center justify-between mt-6 pt-4 border-t border-neutral-50 dark:border-neutral-800">
                   <div className="flex gap-2">
-                    <Button size="sm" variant="ghost" className="rounded-xl bg-neutral-50 dark:bg-neutral-800" onClick={() => handleEdit(p)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-xl bg-neutral-50 dark:bg-neutral-800"
+                      onClick={() => handleEdit(p)}>
                       <Edit3 size={16} />
                     </Button>
-                    <Button size="sm" variant="ghost" className="rounded-xl bg-red-50 dark:bg-red-900/10 text-red-500" onClick={() => deleteProgram(p.id)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-xl bg-red-50 dark:bg-red-900/10 text-red-500"
+                      onClick={() => confirmDelete(p.id)}>
                       <Trash2 size={16} />
                     </Button>
                   </div>
@@ -201,7 +243,9 @@ const BaitulMaal = () => {
         ) : (
           <div className="col-span-full p-20 text-center border-2 border-dashed border-neutral-200 rounded-[3rem]">
             <Box size={48} className="mx-auto text-neutral-300 mb-4" />
-            <p className="text-neutral-400 font-bold">Data kosong melompong, Bre!</p>
+            <p className="text-neutral-400 font-bold">
+              Data kosong melompong, Bre!
+            </p>
           </div>
         )}
       </div>
@@ -351,7 +395,8 @@ const BaitulMaal = () => {
 
           <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
-              <Video size={16} className="text-blue-500" /> Video Program (Opsional)
+              <Video size={16} className="text-blue-500" /> Video Program
+              (Opsional)
             </label>
             <input
               type="file"
