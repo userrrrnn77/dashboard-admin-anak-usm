@@ -10,15 +10,17 @@ import {
   Maximize2,
   Camera,
   X,
+  Play,
 } from "lucide-react";
-import type { gallery as IGallery } from "../api/gallery";
+import type { gallery as IGallery, IGalleryPayload } from "../api/gallery";
 import { Badge } from "../components/ui/Badge";
 import Title from "../components/common/Title";
 import Swal from "sweetalert2";
 import { useThemeStore } from "../store/themeStore";
+import { toast } from "sonner";
 
 const Gallery = () => {
-  const { images, isLoading, addPhoto, deleteImage } = useGallery();
+  const { items, isLoading, addPhoto, deleteImage } = useGallery();
 
   const { isDarkMode } = useThemeStore();
 
@@ -40,28 +42,37 @@ const Gallery = () => {
 
   const handleUpload = async () => {
     if (tempFiles.length === 0) return;
-
     setIsUploading(true);
-    try {
-      const uploadedImages = [];
 
-      // 1. Looping upload ke Cloudinary satu-satu
+    try {
+      const uploadedItems = []; // 1. Bikin wadahnya dulu di sini
+
       for (const file of tempFiles) {
+        const isVideo = file.type.startsWith("video");
+
+        // 2. Nembak Cloudinary (Satu per satu)
         const res = await uploadToCloudinary(file);
-        uploadedImages.push({
+
+        // 3. NAH, TAROH DI SINI, BGSD!
+        // Tepat setelah 'res' dapet balikan dari Cloudinary
+        uploadedItems.push({
           src: res.secure_url,
           publicId: res.public_id,
-          caption: file.name.split(".")[0], // Default caption dari nama file
+          type: (isVideo ? "video" : "image") as "video" | "image", // Pake 'as' biar TS kaga rewel
+          alt: file.name.split(".")[0],
+          size: file.size,
         });
       }
 
-      // 2. Setor JSON array ke Backend
-      await addPhoto({ images: uploadedImages } as IGallery);
+      // 4. Setelah looping kelar, baru setor semua ke Backend
+      await addPhoto({ items: uploadedItems } as IGalleryPayload);
 
       setIsUploadOpen(false);
       setTempFiles([]);
+      toast.success("Mabes Dokumentasi Update, Bre!");
     } catch (err) {
-      console.error("Gagal nyetor foto ke galeri, Bre!", err);
+      console.error("Gagal nyetor konten, Bre!", err);
+      toast.error("Gagal upload, server lu meriang kali!");
     } finally {
       setIsUploading(false);
     }
@@ -104,7 +115,7 @@ const Gallery = () => {
             </h1>
             <p className="text-neutral-500 text-sm font-medium mt-1">
               {
-                images.length
+                items.length
                 //   Property 'length' does not exist on type '{}'.
               }{" "}
               Foto kenangan tersimpan.
@@ -114,7 +125,7 @@ const Gallery = () => {
         <Button
           onClick={() => setIsUploadOpen(true)}
           className="bg-neutral-900 dark:bg-indigo-600 py-7 px-8 rounded-2xl shadow-xl transition-all active:scale-95">
-          <Plus size={20} className="mr-2" /> Tambah Foto
+          <Plus size={20} className="mr-2" /> Tambah Dokumen
         </Button>
       </div>
 
@@ -128,30 +139,58 @@ const Gallery = () => {
               />
             ))
           : // Pake interface IGallery (yang lu dapet dari import gallery)
-            (images as IGallery[]).map((img: IGallery, index: number) => (
+            (items as IGallery[]).map((img: IGallery, index: number) => (
               <div
-                key={img.publicId || index} // Pake publicId atau index biar kaga rewel key-nya
+                key={img.publicId || index}
                 className="group relative aspect-square bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-                <img
-                  src={img.src}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  alt={img.alt || "Dokumentasi KSPPS"}
-                />
+                {/* 🔥 LOGIC THUMBNAIL: CEK TIPE KONTEN */}
+                {img.type === "video" ? (
+                  <div className="relative w-full h-full">
+                    <video
+                      src={img.src}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      muted
+                      playsInline
+                      onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
+                      onMouseOut={(e) => {
+                        const v = e.target as HTMLVideoElement;
+                        v.pause();
+                        v.currentTime = 0; // Balik ke awal biar rapi
+                      }}
+                    />
+                    {/* Icon Play di Pojok biar User tau ini Video, bgsyad! */}
+                    <div className="absolute top-3 left-3 p-2 bg-black/40 backdrop-blur-md rounded-full text-white">
+                      <Play size={12} fill="currentColor" />
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={img.src}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    alt={img.alt || "Dokumentasi KSPPS"}
+                  />
+                )}
 
-                {/* OVERLAY ACTIONS */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                {/* OVERLAY ACTIONS - KITA KASIH POINTER EVENTS NONE PAS AWAL */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[1px] pointer-events-none group-hover:pointer-events-auto">
                   <Button
                     type="button"
-                    onClick={() => img.src && openPreview(img.src)}
-                    className="p-3 bg-white/20 hover:bg-white/40 text-white rounded-2xl transition-all">
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (img.src) {
+                        openPreview(img.src);
+                      }
+                    }}
+                    className="p-3 bg-white/20 hover:bg-indigo-500 text-white rounded-2xl transition-all shadow-xl">
                     <Maximize2 size={20} />
                   </Button>
                   <Button
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       confirmDelete(img._id || "");
                     }}
-                    className="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-2xl transition-all">
+                    className="p-3 bg-red-500/80 hover:bg-red-600 text-white rounded-2xl transition-all shadow-xl">
                     <Trash2 size={20} />
                   </Button>
                 </div>
@@ -173,7 +212,7 @@ const Gallery = () => {
             <input
               type="file"
               multiple
-              accept="image/*"
+              accept="image/*, video/*"
               className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-indigo-50 file:text-indigo-700 cursor-pointer"
               onChange={handleFileChange}
             />
@@ -208,14 +247,27 @@ const Gallery = () => {
         <div className="fixed inset-0 z-999 flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
           <button
             onClick={() => setIsPreviewOpen(false)}
-            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all">
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all z-1000">
             <X size={24} />
           </button>
-          <img
-            src={selectedImg}
-            className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain animate-in zoom-in-95 duration-300"
-            alt="Preview"
-          />
+
+          {/* 🔥 TS-SAFE: Casting ke array gallery biar dia nemu property .src ama .type */}
+          {(items as unknown as { items: IGallery[] }).items?.find(
+            (i) => i.src === selectedImg,
+          )?.type === "video" || selectedImg.match(/\.(mp4|webm|ogg|mov)$/i) ? (
+            <video
+              src={selectedImg}
+              className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain animate-in zoom-in-95 duration-300"
+              controls
+              autoPlay
+            />
+          ) : (
+            <img
+              src={selectedImg}
+              className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain animate-in zoom-in-95 duration-300"
+              alt="Preview"
+            />
+          )}
         </div>
       )}
     </div>

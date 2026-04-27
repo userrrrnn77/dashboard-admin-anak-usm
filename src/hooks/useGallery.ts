@@ -3,7 +3,7 @@ import {
   getAllGallery,
   deleteGallery,
   createGallery,
-  type gallery,
+  type IGalleryPayload,
 } from "../api/gallery";
 import { toast } from "sonner";
 
@@ -15,13 +15,13 @@ export const useGallery = () => {
     queryFn: getAllGallery,
   });
 
-  const images = (data?.data?.data as gallery[]) || [];
+  const items = (data?.data?.data as IGalleryPayload[]) || [];
 
   const createAction = useMutation({
     mutationFn: createGallery,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
-      toast.success("Foto masuk galeri!");
+      toast.success("Konten masuk galeri!");
     },
   });
 
@@ -34,7 +34,7 @@ export const useGallery = () => {
   });
 
   return {
-    images: images,
+    items: items,
     isLoading,
     addPhoto: createAction.mutateAsync,
     deleteImage: deleteAction.mutate,
