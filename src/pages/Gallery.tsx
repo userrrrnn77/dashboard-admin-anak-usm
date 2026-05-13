@@ -69,7 +69,7 @@ const Gallery = () => {
 
       setIsUploadOpen(false);
       setTempFiles([]);
-      toast.success("Mabes Dokumentasi Update, Bre!");
+      toast.success("Mabes Dokumentasi Update.");
     } catch (err) {
       console.error("Gagal nyetor konten, Bre!", err);
       toast.error("Gagal upload, server lu meriang kali!");
@@ -85,7 +85,7 @@ const Gallery = () => {
 
   const confirmDelete = (id: string) => {
     Swal.fire({
-      title: "Yakin dibuang, Bre?",
+      title: "Yakin mau dibuang?",
       text: "Data ini bakal ilang selamanya!",
       icon: "warning",
       showCancelButton: true,

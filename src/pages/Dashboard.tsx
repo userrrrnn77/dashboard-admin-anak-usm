@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   const { programs, isLoading: programLoading } = useBaitulMaal();
 
-  const {products} = useProduct()
+  const { products } = useProduct();
 
   const isLoading = userLoading || programLoading;
 
@@ -25,13 +25,11 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      <Title>
-        Dashboard Admin | Mitra Hasanah
-      </Title>
+      <Title>Dashboard Admin | Mitra Hasanah</Title>
       <div>
         <h1 className="text-2xl font-bold">Dashboard Overview</h1>
         <p className="text-neutral-500 text-sm">
-          Pantau semua aktivitas Bisnis Digital lu di sini, Bre.
+          Pantau semua aktivitas Bisnis Digital disini.
         </p>
       </div>
 
@@ -40,7 +38,7 @@ const Dashboard = () => {
           title="Total Admin"
           value={isLoading ? "..." : userList.length}
           icon={<Users size={24} />}
-          />
+        />
         <StatCard
           title="Pendaftar Baru"
           value={isLoading ? "..." : regList.length}
@@ -54,7 +52,7 @@ const Dashboard = () => {
         />
         <StatCard
           title="Total Produk"
-          value={isLoading ? "...": products.length} // Property 'length' does not exist on type '{}'.
+          value={isLoading ? "..." : products.length} // Property 'length' does not exist on type '{}'.
           icon={<Package size={24} />}
         />
       </div>
@@ -64,7 +62,7 @@ const Dashboard = () => {
         <div className="lg:col-span-2 bg-white dark:bg-neutral-800 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-700 min-h-75">
           <h3 className="font-bold mb-4">Grafik Pertumbuhan (Coming Soon)</h3>
           <div className="flex items-center justify-center h-full text-neutral-400 italic">
-            Visualisasi data nyusul, kita rakit CRUD dulu Bre...
+            Visualisasi data nyusul, kita rakit CRUD dulu
           </div>
         </div>
 

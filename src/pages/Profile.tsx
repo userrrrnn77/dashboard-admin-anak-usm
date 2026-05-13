@@ -109,7 +109,7 @@ const Profile = () => {
         id: userId,
         data: payload as User, // Cast ke User karena interface API lu biasanya minta itu
       });
-      toast.success("Data berhasil diupdate, Bre!");
+      toast.success("Data berhasil diupdate!");
       await fetchMe();
     } catch (err) {
       console.error(err);

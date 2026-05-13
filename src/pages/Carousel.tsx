@@ -39,9 +39,9 @@ const Carousel = () => {
     if (!title)
       return Swal.fire({
         title: "PAOK LU!",
-        text: "NAMANYA ISI DULU BRE ANJAY!",
+        text: "Jangan lupa isi namanya!",
         icon: "warning",
-        confirmButtonText: "oke bre siap..",
+        confirmButtonText: "oke siap..",
       });
 
     setIsUploading(true);
@@ -57,15 +57,13 @@ const Carousel = () => {
           publicId: res.public_id,
         };
 
-        console.log("NEMBAK DATA INI BRE:", payload);
-        
         await addCarousel(payload);
       }
 
       toast.success("Semua foto berhasil mendarat di Galeri! 🚀");
       handleCancelUpload(); // Pake fungsi cancel biar bersih semua state-nya
     } catch (err) {
-      console.error("Gagal nyetor foto ke carousel, Bre!", err);
+      console.error("Gagal nyetor foto ke carousel!", err);
       toast.error("Ada yang nyangkut pas upload, cek koneksi lu!");
     } finally {
       setIsUploading(false);
@@ -79,13 +77,13 @@ const Carousel = () => {
 
   const confirmDelete = (id: string) => {
     Swal.fire({
-      title: "Yakin dibuang, Bre?",
+      title: "Yakin mau dibuang?",
       text: "Data ini bakal ilang selamanya!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus!",
       cancelButtonText: "Batal",
-      theme: isDarkMode ? "dark" : "light", //  gini kan enak bre
+      theme: isDarkMode ? "dark" : "light", 
     }).then((result) => {
       if (result.isConfirmed) {
         // 🚀 BARU PANGGIL MUTATE DI SINI!
@@ -108,7 +106,7 @@ const Carousel = () => {
     // 3. Tutup Modal
     setIsUploadOpen(false);
 
-    toast.info("Gajadi upload? Lemah lu, Bre! 🤣");
+    toast.info("Gajad Upload? 🤣");
   };
 
   return (
@@ -202,7 +200,7 @@ const Carousel = () => {
           </div>
 
           <Input
-            label="Masukan Namanya bre"
+            label="Masukan Namanya"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />

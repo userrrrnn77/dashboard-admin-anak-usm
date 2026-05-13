@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react"; // Tambah useMemo biar makin gacor
 import { useProduct } from "../hooks/useProduct";
 import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
@@ -44,10 +44,10 @@ const Products = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1); // Step 1: Katalog, Step 2: Jeroan
+  const [step, setStep] = useState<1 | 2>(1);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
 
-  // --- FORM DATA KATALOG (Step 1) ---
+  // --- FORM STATES ---
   const [formData, setFormData] = useState<IProduct>({
     id: "",
     title: "",
@@ -56,15 +56,21 @@ const Products = () => {
     category: "simpanan",
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  // --- FORM DATA JEROAN (Step 2) ---
   const [detailData, setDetailData] = useState<IProductDetail>({
     title: "",
     description: "",
     sections: [{ subtitle: "", items: [""] }],
   });
 
-  // --- HANDLERS LOGIC ---
+  // --- COMPUTED DATA (FILTER & SORT) ---
+  // Kita pake useMemo biar sorting cuma jalan kalo data 'products' beneran berubah
+  const displayProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    // Kita spread [...] biar ga mutasi array asli, trus reverse biar yang baru di atas
+    return [...products].reverse();
+  }, [products]);
+
+  // --- HANDLERS ---
   const handleOpenForm = (p?: IProduct) => {
     if (p) {
       setIsEditMode(true);
@@ -76,7 +82,7 @@ const Products = () => {
         desc: p.desc || "",
         category: p.category || "simpanan",
       });
-      setStep(1); // Edit biasanya fokus ke katalog dulu
+      setStep(1);
     } else {
       setIsEditMode(false);
       setSelectedProduct(null);
@@ -103,7 +109,6 @@ const Products = () => {
     setIsDetailOpen(true);
   };
 
-  // Logic Jeroan (Step 2)
   const addSection = () => {
     setDetailData({
       ...detailData,
@@ -129,13 +134,10 @@ const Products = () => {
     setDetailData({ ...detailData, sections: newSections });
   };
 
-  // --- MAIN SUBMIT ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       if (step === 1) {
-        // --- PROSES KATALOG ---
         let imageUrl = formData.image;
         let publicId = selectedProduct?.publicId;
 
@@ -153,7 +155,6 @@ const Products = () => {
           toast.success("Katalog aman, gas update jeroannya!");
         } else {
           await createProduct(payload);
-          // Auto-set detail title & pindah step
           setDetailData((prev) => ({
             ...prev,
             title: formData.fullTitle || formData.title,
@@ -173,38 +174,35 @@ const Products = () => {
             .filter((sec) => sec.subtitle.trim() !== ""),
         };
 
-        // 2. Eksekusi sesuai mode
         if (isEditMode) {
-          // Edit pake PATCH (sesuai request lu tadi, Wizard!)
           await updateDetail({ id: String(formData.id), data: finalPayload });
-          toast.success("Jeroan berhasil di-PATCH, Bre! 🪄");
+          toast.success("Jeroan berhasil di-PATCH 🪄");
         } else {
-          // Barang baru pake POST
-          await createDetail(finalPayload); // <--- Pake finalPayload juga di sini, bgsd!
-          toast.success("Barang rilis sempurna, Bre! 🚀");
+          await createDetail(finalPayload);
+          toast.success("Barang rilis sempurna 🚀");
         }
 
         setIsFormOpen(false);
         setStep(1);
-        toast.success("Barang rilis sempurna, Bre! 🚀");
       }
     } catch (err) {
       console.error("Gagal rilis barang, Bre!", err);
+      toast.error("Waduh, gagal bgsd!");
     }
   };
 
   const confirmDelete = (id: string) => {
     Swal.fire({
-      title: "Yakin dibuang, Bre?",
+      title: "Yakin mau dibuang?",
       text: "Data ini bakal ilang selamanya!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Iya, Hapus!",
       cancelButtonText: "Batal, Mbot",
-      theme: isDarkMode ? "dark" : "light", //  gini kan enak bre
+      background: isDarkMode ? "#171717" : "#fff",
+      color: isDarkMode ? "#fff" : "#171717",
     }).then((result) => {
       if (result.isConfirmed) {
-        // 🚀 BARU PANGGIL MUTATE DI SINI!
         deleteProduct(id);
       }
     });
@@ -213,7 +211,7 @@ const Products = () => {
   return (
     <div className="p-6 space-y-6">
       <Title>Products | Dashboard Admin</Title>
-      {/* HEADER */}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-neutral-900 p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-4 bg-emerald-500 rounded-3xl shadow-lg shadow-emerald-500/20 text-white">
@@ -235,17 +233,16 @@ const Products = () => {
         </Button>
       </div>
 
-      {/* LIST DATA */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          Array.from({ length: products.length || 5 }).map((_, i) => (
+          Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
               className="h-64 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-4xl"
             />
           ))
-        ) : Array.isArray(products) && products.length > 0 ? (
-          products.reverse().map((p: IProduct) => (
+        ) : displayProducts.length > 0 ? (
+          displayProducts.map((p: IProduct) => (
             <div
               key={p.id}
               className="group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-4xl overflow-hidden hover:shadow-2xl transition-all duration-300">
@@ -299,13 +296,12 @@ const Products = () => {
           <div className="col-span-full p-20 text-center border-2 border-dashed border-neutral-200 rounded-[3rem]">
             <Box size={48} className="mx-auto text-neutral-300 mb-4" />
             <p className="text-neutral-400 font-bold">
-              Katalog kosong melompong, Bre!
+              Katalog kosong melompong!
             </p>
           </div>
         )}
       </div>
 
-      {/* --- MODAL FORM WIZARD --- */}
       <Modal
         isOpen={isFormOpen}
         onClose={() => {
@@ -328,7 +324,6 @@ const Products = () => {
                 <Input
                   label="Slug ID"
                   disabled={isEditMode}
-                  placeholder="simpanan-pokok"
                   value={formData.id}
                   onChange={(e) =>
                     setFormData({ ...formData, id: e.target.value })
@@ -392,16 +387,13 @@ const Products = () => {
                   {formData.id}
                 </p>
               </div>
-
               <Textarea
                 label="Deskripsi Jeroan"
-                placeholder="Jelaskan detail produk secara mendalam..."
                 value={detailData.description}
                 onChange={(e) =>
                   setDetailData({ ...detailData, description: e.target.value })
                 }
               />
-
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">
@@ -414,7 +406,6 @@ const Products = () => {
                     <PlusCircle size={20} />
                   </button>
                 </div>
-
                 {detailData.sections?.map((sec, sIdx) => (
                   <div
                     key={sIdx}
@@ -427,7 +418,6 @@ const Products = () => {
                     </button>
                     <Input
                       label={`Subtitle ${sIdx + 1}`}
-                      placeholder="Contoh: Syarat Umum"
                       value={sec.subtitle}
                       onChange={(e) => {
                         const newSecs = [...(detailData.sections || [])];
@@ -443,7 +433,6 @@ const Products = () => {
                         <div key={iIdx} className="flex gap-2 items-center">
                           <Input
                             label=""
-                            placeholder={`Item ${iIdx + 1}`}
                             value={item}
                             onChange={(e) => {
                               const newSecs = [...(detailData.sections || [])];
@@ -476,7 +465,6 @@ const Products = () => {
               </div>
             </div>
           )}
-
           <Button
             type="submit"
             className="w-full py-7 bg-emerald-600 font-black uppercase rounded-2xl"
@@ -490,7 +478,6 @@ const Products = () => {
         </form>
       </Modal>
 
-      {/* --- MODAL DETAIL OVERVIEW --- */}
       <Modal
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
@@ -515,7 +502,6 @@ const Products = () => {
                 "{selectedProduct.desc || "No description."}"
               </p>
             </div>
-
             <Button
               onClick={() => setIsDetailOpen(false)}
               variant="outline"

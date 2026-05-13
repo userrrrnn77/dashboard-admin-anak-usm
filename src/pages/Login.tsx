@@ -27,7 +27,7 @@ const Login = () => {
         navigate("/");
       } else {
         console.error("❌ [Login] Gagal, cek respon server di Network Tab.");
-        toast.error("Gagal Login Bre")
+        toast.error("Gagal Login.")
       }
     } catch (err) {
       console.error("🔥 [Login] Error Fatal:", err);
@@ -46,7 +46,7 @@ const Login = () => {
             <ShieldCheck size={32} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Welcome Back, Bre!
+            Welcome Back
           </h1>
           <p className="text-sm text-neutral-500">
             Masukin akses lu buat masuk ke Mabes.
@@ -87,7 +87,7 @@ const Login = () => {
         </form>
 
         <p className="text-center text-xs text-neutral-400">
-          Lupa password? Hubungi Developer Pusat, Bre.
+          Lupa password? Hubungi Developer Pusat.
         </p>
       </div>
     </div>

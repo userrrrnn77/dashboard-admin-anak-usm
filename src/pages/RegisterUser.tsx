@@ -43,7 +43,7 @@ const RegisterUser = () => {
   };
 
   const handleApprove = (id: string) => {
-    if (window.confirm("Yakin mau ACC pendaftar ini, Bre?")) {
+    if (window.confirm("Yakin mau ACC pendaftar ini, ?")) {
       approveUser(id);
       setIsModalOpen(false);
     }
@@ -187,7 +187,7 @@ const RegisterUser = () => {
                   <div className="flex flex-col items-center gap-2">
                     <Shield size={40} className="opacity-20" />
                     <p>
-                      Kosong, Bre.{" "}
+                      Kosong.{" "}
                       {activeTab === "pending"
                         ? "Belum ada antrean."
                         : "Belum ada yang di-ACC."}
@@ -313,7 +313,7 @@ const RegisterUser = () => {
           </div>
         ) : (
           <div className="p-10 text-center text-neutral-500">
-            Data kaga ketemu, Bre.
+            Data kaga ketemu.
           </div>
         )}
       </Modal>

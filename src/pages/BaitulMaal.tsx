@@ -135,13 +135,13 @@ const BaitulMaal = () => {
 
   const confirmDelete = (id: string) => {
     Swal.fire({
-      title: "Yakin dibuang, Bre?",
+      title: "Yakin mau dibuang?",
       text: "Data ini bakal ilang selamanya!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus!",
       cancelButtonText: "Batal",
-      theme: isDarkMode ? "dark" : "light", //  gini kan enak bre
+      theme: isDarkMode ? "dark" : "light",
     }).then((result) => {
       if (result.isConfirmed) {
         // 🚀 BARU PANGGIL MUTATE DI SINI!
@@ -243,9 +243,7 @@ const BaitulMaal = () => {
         ) : (
           <div className="col-span-full p-20 text-center border-2 border-dashed border-neutral-200 rounded-[3rem]">
             <Box size={48} className="mx-auto text-neutral-300 mb-4" />
-            <p className="text-neutral-400 font-bold">
-              Data kosong melompong, Bre!
-            </p>
+            <p className="text-neutral-400 font-bold">Data kosong melompong</p>
           </div>
         )}
       </div>
