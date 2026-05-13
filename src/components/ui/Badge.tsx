@@ -1,7 +1,7 @@
 interface BadgeProps {
   children: React.ReactNode;
   variant?: "success" | "warning" | "danger" | "info" | "outline";
-  className?: string; // Tambahin ini mbot!
+  className?: string; 
 }
 
 export const Badge = ({

@@ -198,7 +198,7 @@ const Products = () => {
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Iya, Hapus!",
-      cancelButtonText: "Batal, Mbot",
+      cancelButtonText: "Batal",
       background: isDarkMode ? "#171717" : "#fff",
       color: isDarkMode ? "#fff" : "#171717",
     }).then((result) => {
