@@ -131,12 +131,19 @@ const BaitulMaal = () => {
     }
   };
 
+  const programList = programs as CreateBaitulMaal[]; // Atau pake interface lu: IProgram[]
+
   const { isDarkMode } = useThemeStore();
 
   const confirmDelete = (id: string) => {
+    const itemMauDihapus = programList.find((p) => p.id === id);
+    const judulProgram = itemMauDihapus?.title || "ini";
+
+    console.log(judulProgram);
+
     Swal.fire({
       title: "Yakin mau dibuang?",
-      text: "Data ini bakal ilang selamanya!",
+      text: `Data ${judulProgram} bakal ilang selamanya!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus!",

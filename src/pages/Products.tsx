@@ -19,7 +19,7 @@ import {
   MinusCircle,
 } from "lucide-react";
 
-import type { product as IProduct } from "../api/product";
+import type { product as IProduct, product } from "../api/product";
 import { type productDetail as IProductDetail } from "../api/productDetail";
 import Title from "../components/common/Title";
 import { toast } from "sonner";
@@ -191,10 +191,15 @@ const Products = () => {
     }
   };
 
+  const productLists = products as product[];
+
   const confirmDelete = (id: string) => {
+    const itemMauDihapus = productLists.find((p) => p.id === id);
+    const judulProduct = itemMauDihapus?.title || "Ini";
+
     Swal.fire({
       title: "Yakin mau dibuang?",
-      text: "Data ini bakal ilang selamanya!",
+      text: `Data ${judulProduct} bakal ilang selamanya!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Iya, Hapus!",

@@ -6,6 +6,7 @@ export const getProgramById = (id: string) =>
   api.get<ResponseBre>(`/baitul-maal/${id}`);
 
 export interface CreateBaitulMaal {
+  id?: string;
   title?: string;
   tagline?: string;
   description?: string;
