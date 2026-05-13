@@ -43,7 +43,7 @@ const UsersPage = () => {
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.password) {
-      return toast.error("Isi semua dulu bgsd, jangan ada yang kosong!");
+      return toast.error("Isi semua dulu, jangan ada yang kosong!");
     }
 
     try {

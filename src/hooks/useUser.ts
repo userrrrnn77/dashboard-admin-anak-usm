@@ -117,8 +117,10 @@ export const useUser = (userId?: string, registrationId?: string) => {
 
   // 🪄 UPDATE USER
   const updateAction = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<User> }) => // The expected type comes from property 'data' which is declared here on type '{ id: string; data: User<string>; }'
-    // udah gw gituin masih gitu bre anjir
+    mutationFn: (
+      { id, data }: { id: string; data: Partial<User> }, // The expected type comes from property 'data' which is declared here on type '{ id: string; data: User<string>; }'
+    ) =>
+      // udah gw gituin masih gitu bre anjir
       updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -137,7 +139,7 @@ export const useUser = (userId?: string, registrationId?: string) => {
     mutationFn: (id: string) => deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User berhasil dimusnahkan, Bre!");
+      toast.success("User berhasil dihapus, Bre!");
     },
     onError: (err: unknown) => {
       const error = err as AxiosError<ErrorResponse>;
