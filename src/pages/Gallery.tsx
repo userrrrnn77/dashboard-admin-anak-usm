@@ -53,7 +53,6 @@ const Gallery = () => {
         // 2. Nembak Cloudinary (Satu per satu)
         const res = await uploadToCloudinary(file);
 
-        // 3. NAH, TAROH DI SINI, BGSD!
         // Tepat setelah 'res' dapet balikan dari Cloudinary
         uploadedItems.push({
           src: res.secure_url,

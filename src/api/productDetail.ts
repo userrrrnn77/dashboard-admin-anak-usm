@@ -13,7 +13,7 @@ export interface productDetail {
 }
 
 export const getDetailProductById = (id: string) =>
-  api.get<ResponseBre>(`/prduct-detail/${id}`);
+  api.get<ResponseBre>(`/product-detail/${id}`);
 
 export const createProductDetail = (data: productDetail) =>
   api.post("/product-detail", data);

@@ -27,8 +27,10 @@ import Swal from "sweetalert2";
 import { useThemeStore } from "../store/themeStore";
 
 const Products = () => {
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const {
     products,
+    productDetail,
     isLoading,
     isActionLoading,
     createProduct,
@@ -36,7 +38,7 @@ const Products = () => {
     deleteProduct,
     createDetail,
     updateDetail,
-  } = useProduct();
+  } = useProduct(selectedProduct?.id);
 
   const { isDarkMode } = useThemeStore();
 
@@ -45,7 +47,6 @@ const Products = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
-  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
 
   // --- FORM STATES ---
   const [formData, setFormData] = useState<IProduct>({
@@ -66,7 +67,7 @@ const Products = () => {
   // Kita pake useMemo biar sorting cuma jalan kalo data 'products' beneran berubah
   const displayProducts = useMemo(() => {
     if (!Array.isArray(products)) return [];
-    // Kita spread [...] biar ga mutasi array asli, trus reverse biar yang baru di atas
+
     return [...products].reverse();
   }, [products]);
 
@@ -81,8 +82,19 @@ const Products = () => {
         fullTitle: p.fullTitle || "",
         desc: p.desc || "",
         category: p.category || "simpanan",
+        image: p.image,
+        publicId: p.publicId,
       });
-      setStep(1);
+      // ambil detail existing
+      if (productDetail) {
+        setDetailData({
+          title: productDetail.title || "", // Property 'title' does not exist on type '{}'.
+          description: productDetail.description || "", // Property 'description' does not exist on type '{}'.
+          sections: productDetail.sections?.length // Property 'sections' does not exist on type '{}'.
+            ? productDetail.sections // Property 'sections' does not exist on type '{}'.
+            : [{ subtitle: "", items: [""] }],
+        });
+      }
     } else {
       setIsEditMode(false);
       setSelectedProduct(null);
@@ -138,6 +150,11 @@ const Products = () => {
     e.preventDefault();
     try {
       if (step === 1) {
+        if (!selectedFile && !isEditMode) {
+          toast.error("Cover produk wajib bre!");
+          return;
+        }
+
         let imageUrl = formData.image;
         let publicId = selectedProduct?.publicId;
 
@@ -187,29 +204,57 @@ const Products = () => {
       }
     } catch (err) {
       console.error("Gagal rilis barang, Bre!", err);
-      toast.error("Waduh, gagal bgsd!");
+      toast.error("Waduh, gagal bre!");
     }
   };
 
   const productLists = products as product[];
 
-  const confirmDelete = (id: string) => {
+  // terus async yang buat delet taroh mana bre? await taroh mana njir?
+  const confirmDelete = async (id: string) => {
     const itemMauDihapus = productLists.find((p) => p.id === id);
-    const judulProduct = itemMauDihapus?.title || "Ini";
 
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Yakin mau dibuang?",
-      text: `Data ${judulProduct} bakal ilang selamanya!`,
+      text: `Data ${itemMauDihapus?.title || "Ini"} bakal ilang selamanya!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Iya, Hapus!",
       cancelButtonText: "Batal",
       background: isDarkMode ? "#171717" : "#fff",
       color: isDarkMode ? "#fff" : "#171717",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteProduct(id);
-      }
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await deleteProduct(id);
+
+      toast.success("Produk berhasil dimusnahkan 🗑️");
+    } catch (error) {
+      console.error(error);
+      toast.error("Gagal hapus produk!");
+    }
+  };
+
+  const resetForm = () => {
+    setStep(1);
+    setSelectedFile(null);
+    setSelectedProduct(null);
+    setIsEditMode(false);
+
+    setFormData({
+      id: "",
+      title: "",
+      fullTitle: "",
+      desc: "",
+      category: "simpanan",
+    });
+
+    setDetailData({
+      title: "",
+      description: "",
+      sections: [{ subtitle: "", items: [""] }],
     });
   };
 
@@ -311,7 +356,7 @@ const Products = () => {
         isOpen={isFormOpen}
         onClose={() => {
           setIsFormOpen(false);
-          setStep(1);
+          resetForm();
         }}
         title={
           step === 1
@@ -331,7 +376,13 @@ const Products = () => {
                   disabled={isEditMode}
                   value={formData.id}
                   onChange={(e) =>
-                    setFormData({ ...formData, id: e.target.value })
+                    setFormData({
+                      ...formData,
+                      id: e.target.value
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")
+                        .replace(/[^a-z0-9-]/g, ""),
+                    })
                   }
                 />
                 <Select
@@ -473,7 +524,8 @@ const Products = () => {
           <Button
             type="submit"
             className="w-full py-7 bg-emerald-600 font-black uppercase rounded-2xl"
-            isLoading={isActionLoading}>
+            isLoading={isActionLoading}
+            disabled={isActionLoading}>
             {step === 1
               ? isEditMode
                 ? "Simpan Perubahan 🪄"

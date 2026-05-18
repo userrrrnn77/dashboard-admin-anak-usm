@@ -56,8 +56,6 @@ const Profile = () => {
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
 
-      console.log("🔍 Ngecek ID pas upload:", userId); // Pastiin ini muncul
-
       if (!file) return;
       if (!userId) {
         toast.error("UserID masih kosong, tunggu bentar atau refresh!");

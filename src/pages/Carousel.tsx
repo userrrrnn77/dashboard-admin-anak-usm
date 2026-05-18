@@ -101,7 +101,7 @@ const Carousel = () => {
 
     // 2. Kosongin State
     setTempFiles([]);
-    setTitle(""); // Reset judul juga, bgsd!
+    setTitle("");
 
     // 3. Tutup Modal
     setIsUploadOpen(false);

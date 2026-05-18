@@ -58,8 +58,6 @@ export const useAuth = () => {
     try {
       const { data } = await loginapi(payload);
 
-      console.log("📦 [useAuth] Data dari server:", data);
-
       // Kita cast 'data' langsung ke LoginSuccessData karena backend kaga pake bungkus 'data' lagi
       const authData = data as unknown as LoginSuccessData;
 
@@ -106,8 +104,6 @@ export const useAuth = () => {
       // Kasih tau TS kalau 'data' itu bentuknya GetMeResponse
       const response = await getMeapi();
       const data = response.data as GetMeResponse;
-
-      console.log("🔥 DATA DARI API GETME:", data);
 
       if (data.success && data.user) {
         setuser({

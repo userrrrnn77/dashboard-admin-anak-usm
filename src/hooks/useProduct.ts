@@ -102,23 +102,26 @@ export const useProduct = (productId?: string) => {
   return {
     // --- Data ---
     products: (productsQuery.data?.data?.data as product[]) || [],
-    productDetail: detailQuery.data?.data?.data || null,
+    productDetail: (detailQuery.data?.data?.data as productDetail) || null,
 
     // --- Status ---
     isLoading: productsQuery.isLoading || detailQuery.isLoading,
     isActionLoading:
       createProductAction.isPending ||
       updateProductAction.isPending ||
-      deleteProductAction.isPending,
+      deleteProductAction.isPending ||
+      createDetailAction.isPending ||
+      updateDetailAction.isPending ||
+      deleteDetailAction.isPending,
 
     // --- Actions (Product Utama) ---
     createProduct: createProductAction.mutateAsync,
     updateProduct: updateProductAction.mutateAsync,
-    deleteProduct: deleteProductAction.mutate,
+    deleteProduct: deleteProductAction.mutateAsync,
 
     // --- Actions (Detail) ---
     createDetail: createDetailAction.mutateAsync,
     updateDetail: updateDetailAction.mutateAsync,
-    deleteDetail: deleteDetailAction.mutate,
+    deleteDetail: deleteDetailAction.mutateAsync,
   };
 };

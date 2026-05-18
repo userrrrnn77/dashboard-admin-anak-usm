@@ -17,10 +17,12 @@ import {
   Video,
   Box,
   ChevronRight,
+  CheckCircle2,
 } from "lucide-react";
 import Title from "../components/common/Title";
 import Swal from "sweetalert2";
 import { useThemeStore } from "../store/themeStore";
+import { toast } from "sonner";
 
 interface BaitulMaalItem extends CreateBaitulMaal {
   id: string;
@@ -37,6 +39,16 @@ const BaitulMaal = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<BaitulMaalItem | null>(
+    null,
+  );
+
+  const handleOpenDetail = (program: BaitulMaalItem) => {
+    setSelectedProgram(program);
+    setIsDetailOpen(true);
+  };
 
   const [formData, setFormData] = useState<{
     id: string;
@@ -106,6 +118,22 @@ const BaitulMaal = () => {
         videoUrls = [uploadedVideo.secure_url];
       }
 
+      const isImageEmpty =
+        selectedImages.length === 0 && formData.images.length === 0;
+
+      if (
+        !formData.id.trim() ||
+        !formData.title.trim() ||
+        !formData.tagline.trim() ||
+        !formData.description.trim() ||
+        isImageEmpty
+      ) {
+        toast.error("Isi semua field wajib termasuk minimal 1 gambar bre");
+
+        setIsSubmitting(false);
+        return;
+      }
+
       const payload = {
         id: formData.id,
         title: formData.title,
@@ -113,8 +141,11 @@ const BaitulMaal = () => {
         description: formData.description,
         category: formData.category,
         features: features.filter((f) => f.trim() !== ""),
-        images: imageUrls.length > 0 ? imageUrls : formData.images, // Logic fallback image
-        videoUrl: videoUrls,
+        images:
+          imageUrls.length > 0
+            ? [...formData.images, ...imageUrls]
+            : formData.images,
+        videoUrl: videoUrls.length > 0 ? videoUrls : [],
       };
 
       if (isEditMode && selectedId) {
@@ -135,26 +166,30 @@ const BaitulMaal = () => {
 
   const { isDarkMode } = useThemeStore();
 
-  const confirmDelete = (id: string) => {
+  const confirmDelete = async (id: string) => {
     const itemMauDihapus = programList.find((p) => p.id === id);
-    const judulProgram = itemMauDihapus?.title || "ini";
 
-    console.log(judulProgram);
-
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Yakin mau dibuang?",
-      text: `Data ${judulProgram} bakal ilang selamanya!`,
+      text: `Data ${itemMauDihapus?.title || "ini"} bakal ilang selamanya!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus!",
       cancelButtonText: "Batal",
-      theme: isDarkMode ? "dark" : "light",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // 🚀 BARU PANGGIL MUTATE DI SINI!
-        deleteProgram(id);
-      }
+      background: isDarkMode ? "#171717" : "#fff",
+      color: isDarkMode ? "#fff" : "#171717",
     });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await deleteProgram(id);
+
+      toast.success("Program berhasil dimusnahkan 🗑️");
+    } catch (error) {
+      console.error(error);
+      toast.error("Gagal hapus program!");
+    }
   };
 
   return (
@@ -240,7 +275,9 @@ const BaitulMaal = () => {
                       <Trash2 size={16} />
                     </Button>
                   </div>
-                  <button className="flex items-center gap-1 text-[10px] font-black uppercase text-rose-600 hover:gap-2 transition-all">
+                  <button
+                    className="flex items-center gap-1 text-[10px] font-black uppercase text-rose-600 hover:gap-2 transition-all"
+                    onClick={() => handleOpenDetail(p)}>
                     Lihat Program <ChevronRight size={14} />
                   </button>
                 </div>
@@ -270,7 +307,15 @@ const BaitulMaal = () => {
               required
               placeholder="id-program-sosial"
               value={formData.id}
-              onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  id: e.target.value
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, ""),
+                })
+              }
             />
             <div className="space-y-1.5 w-full">
               <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
@@ -418,6 +463,135 @@ const BaitulMaal = () => {
             {isEditMode ? "Simpan Perubahan 🪄" : "Rilis Program Sekarang 🚀"}
           </Button>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        title="Overview Detail Program">
+        {selectedProgram && (
+          <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-300">
+            {/* HERO IMAGE BANNER CONTAINER */}
+            <div className="relative h-60 rounded-3xl overflow-hidden shadow-md border border-neutral-100 dark:border-neutral-700">
+              <img
+                src={selectedProgram.images?.[0]}
+                className="w-full h-full object-cover"
+                alt=""
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent flex items-end p-6">
+                <div className="space-y-2 w-full">
+                  <Badge
+                    variant={
+                      selectedProgram.category === "SOSIAL" ? "success" : "info"
+                    }>
+                    {selectedProgram.category}
+                  </Badge>
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tight leading-tight">
+                    {selectedProgram.title}
+                  </h2>
+                  <p className="text-xs text-neutral-400 font-mono">
+                    ID: {selectedProgram.id}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* TAGLINE MOTIVASI */}
+            <div className="bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-4 shadow-xs">
+              <p className="text-sm italic font-medium text-neutral-600 dark:text-neutral-300 pl-2 border-l-4 border-rose-500">
+                "{selectedProgram.tagline || "No tagline available."}"
+              </p>
+            </div>
+
+            {/* DESKRIPSI UTAMA */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">
+                Deskripsi Lengkap
+              </h3>
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 whitespace-pre-line bg-white dark:bg-neutral-800 rounded-2xl">
+                {selectedProgram.description}
+              </p>
+            </div>
+
+            {/* FEATURES / BENEFITS / KEGIATAN */}
+            {selectedProgram.features &&
+              selectedProgram.features.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">
+                    Benefit / Kegiatan Program
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {selectedProgram.features.map((feat, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800/60 text-xs font-semibold flex items-center gap-3 text-neutral-700 dark:text-neutral-300">
+                        <CheckCircle2
+                          size={16}
+                          className="text-emerald-500 shrink-0"
+                        />
+                        <span className="truncate">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* GALLERY IMAGES MULTI (GRID OPTIMIZED) */}
+            {selectedProgram.images && selectedProgram.images.length > 1 && (
+              <div className="space-y-3">
+                <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">
+                  Dokumentasi Galeri ({selectedProgram.images.length - 1})
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {selectedProgram.images.slice(1).map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="aspect-square rounded-2xl overflow-hidden border border-neutral-100 dark:border-neutral-700 bg-neutral-100 group">
+                      <img
+                        src={img}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        alt={`Gallery ${idx}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* VIDEO SECTION RESPONSIVE */}
+            {selectedProgram.videoUrl &&
+              selectedProgram.videoUrl.length > 0 &&
+              selectedProgram.videoUrl[0] && (
+                <div className="space-y-3">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">
+                    Video Promosi / Dokumentasi
+                  </h3>
+                  <div className="aspect-video w-full rounded-2xl overflow-hidden border border-neutral-100 dark:border-neutral-700 bg-black shadow-inner">
+                    <video
+                      controls
+                      preload="metadata"
+                      className="w-full h-full object-contain">
+                      <source
+                        src={selectedProgram.videoUrl[0]}
+                        type="video/mp4"
+                      />
+                      Browser lu jembot kaga support video player, Bre!
+                    </video>
+                  </div>
+                </div>
+              )}
+
+            {/* FOOTER ACTION INNER MODAL */}
+            <div className="pt-4 border-t border-neutral-100 dark:border-neutral-700 flex gap-3">
+              <Button
+                onClick={() => setIsDetailOpen(false)}
+                variant="outline"
+                className="w-full py-3.5 font-bold rounded-xl">
+                Tutup Overview
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
