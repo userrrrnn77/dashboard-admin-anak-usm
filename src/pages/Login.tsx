@@ -23,11 +23,10 @@ const Login = () => {
       const success = await loginAction(formData);
 
       if (success) {
-        toast.success("Login Berhasil")
+        toast.success("Login Berhasil");
         navigate("/");
       } else {
         console.error("❌ [Login] Gagal, cek respon server di Network Tab.");
-        toast.error("Gagal Login.")
       }
     } catch (err) {
       console.error("🔥 [Login] Error Fatal:", err);
@@ -36,9 +35,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 p-6">
-      <Title>
-        Login | Dashboard Admin
-      </Title>
+      <Title>Login | Dashboard Admin</Title>
       <div className="w-full max-w-md space-y-8 bg-white dark:bg-neutral-900 p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
         {/* Logo/Icon */}
         <div className="text-center space-y-2">

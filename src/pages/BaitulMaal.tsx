@@ -575,7 +575,7 @@ const BaitulMaal = () => {
                         src={selectedProgram.videoUrl[0]}
                         type="video/mp4"
                       />
-                      Browser lu jembot kaga support video player, Bre!
+                      Browser lu kaga support video player, Bre!
                     </video>
                   </div>
                 </div>

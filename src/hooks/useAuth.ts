@@ -64,15 +64,14 @@ export const useAuth = () => {
       if (data.success && authData.token && authData.user) {
         // Sekarang ini pasti ketemu nilainya, kaga bakal undefined!
         setauth(authData.user, authData.token);
-        toast.success("Login Berhasil, Bre! Selamat datang di Mabes.");
         return true;
       }
 
       return false;
     } catch (err: unknown) {
       const error = err as AxiosError<ErrorResponse>;
-      const msg = error.response?.data?.message || "Login Gagal, Bgsd!";
-      toast.error(msg);
+      const msg = error.response?.data?.message || "Login Gagal";
+      toast.error(msg, { duration: 10000 });
       return false;
     } finally {
       setLoading(false);
