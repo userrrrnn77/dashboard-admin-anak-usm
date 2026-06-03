@@ -1,0 +1,27 @@
+FLOW.txt
+
+------------------------------------------------------------------------
+🖥️ KELOMPOK 2: FRONTEND DASHBOARD ADMIN (VITE + REACT)
+------------------------------------------------------------------------
+1. Buka jendela terminal atau Command Prompt (CMD) BARU (Jangan digabung).
+2. Masuk ke dalam folder 'dashboard-admin'.
+3. Install semua library frontend dengan mengetik perintah:
+   
+   npm install
+
+4. Jalankan server lokal frontend dengan mengetik perintah:
+   
+   npm run dev
+
+5. Terminal akan memunculkan link lokal, biasanya: http://localhost:5173
+6. Copas link tersebut ke browser Google Chrome kalian. BOOM! Dashboard
+   Admin siap digunakan!
+
+========================================================================
+📝 CATATAN KELOMPOK:
+- Jangan lupa buka isi file 'package.json' di masing-masing folder.
+- Pada bagian "author", silakan ganti "nama-kelompok" dan "name" 
+  sesuai dengan nama kelompok asli kalian sebelum dikumpulkan ke dosen!
+========================================================================
+DEVELOPED BY: Bre Corp. 😎🚀
+========================================================================
