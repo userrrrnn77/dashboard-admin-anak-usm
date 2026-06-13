@@ -34,5 +34,5 @@ export const uploadToCloudinary = async (file: File) => {
     throw new Error(data?.error?.message || "Upload gagal");
   }
 
-  return data; // secure_url
+  return data;
 };

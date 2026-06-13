@@ -9,6 +9,7 @@ import {
   UserRoundCheck,
   GalleryHorizontal,
   X,
+  Newspaper
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -19,6 +20,7 @@ const menuItems = [
   { name: "Carousel", path: "/carousel", icon: GalleryHorizontal },
   { name: "Program Baitul Maal", path: "/baitul-maal", icon: HeartHandshake },
   { name: "Produk", path: "/products", icon: Package },
+  { name: "Berita", path: "/news", icon: Newspaper },
   { name: "Galeri Kegiatan", path: "/gallery", icon: ImageIcon },
 ];
 
