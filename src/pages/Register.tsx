@@ -23,7 +23,6 @@ const Register = () => {
     e.preventDefault();
     const success = await registerAction(formData);
     if (success) {
-      // Kalo sukses, balikin ke halaman manajemen user
       navigate("/login");
     }
   };

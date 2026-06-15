@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser, type RegistrationData } from "../hooks/useUser";
 import { Table, THead } from "../components/ui/Table";
 import { Button } from "../components/ui/Button";
@@ -13,13 +13,19 @@ import {
   Search,
   Users,
   Clock,
+  X,
 } from "lucide-react";
 import Title from "../components/common/Title";
+import Swal from "sweetalert2";
+import { useThemeStore } from "../store/themeStore";
 
 const RegisterUser = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"pending" | "verified">("pending");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const { isDarkMode } = useThemeStore();
 
   const {
     registrations,
@@ -30,6 +36,8 @@ const RegisterUser = () => {
     isDetailLoading,
     isLoading,
     deleteRegistration,
+
+    historyTransactionDetail,
   } = useUser(undefined, selectedId || undefined);
 
   // 🔍 Filter data berdasarkan tab
@@ -37,30 +45,52 @@ const RegisterUser = () => {
     activeTab === "pending" ? !reg.isVerified : reg.isVerified,
   );
 
+  useEffect(() => {}, [historyTransactionDetail]);
+
   const handleOpenDetail = (id: string) => {
     setSelectedId(id);
     setIsModalOpen(true);
   };
 
-  const handleApprove = (id: string) => {
-    if (window.confirm("Yakin mau ACC pendaftar ini, ?")) {
-      approveUser(id);
-      setIsModalOpen(false);
-    }
+  const handleApprove = (id: string, name?: string) => {
+    Swal.fire({
+      title: "Yakin mau ACC pendaftar ini?",
+      text: `Yakin mau tambahkan ${name}`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Ya, ACC!",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#10b981",
+      background: isDarkMode ? "#171717" : "#fff",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        approveUser(id);
+        setIsModalOpen(false);
+      }
+    });
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm("Beneran mau dimusnahkan? Kaga bisa balik lagi loh.")) {
-      deleteRegistration(id);
-      setIsModalOpen(false);
-    }
+  const handleDelete = (id: string, name?: string) => {
+    Swal.fire({
+      title: `Beneran ${name} mau dimusnahkan?`,
+      text: "Kaga bisa balik lagi loh.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hapus!",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#ef4444",
+      background: isDarkMode ? "#171717" : "#fff",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteRegistration(id);
+        setIsModalOpen(false);
+      }
+    });
   };
 
   return (
     <div className="p-6 space-y-6">
-      <Title>
-        Register ACC | Dashboard Admin
-      </Title>
+      <Title>Register ACC | Dashboard Admin</Title>
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -164,7 +194,7 @@ const RegisterUser = () => {
                         <Button
                           size="sm"
                           variant="success"
-                          onClick={() => handleApprove(reg._id)}
+                          onClick={() => handleApprove(reg._id, reg.fullName)}
                           isLoading={isApproving && selectedId === reg._id}>
                           <Check size={16} />
                         </Button>
@@ -173,7 +203,7 @@ const RegisterUser = () => {
                         size="sm"
                         variant="ghost"
                         className="text-red-500 hover:bg-red-50"
-                        onClick={() => handleDelete(reg._id)}
+                        onClick={() => handleDelete(reg._id, reg.fullName)}
                         isLoading={isDeleting && selectedId === reg._id}>
                         <Trash2 size={16} />
                       </Button>
@@ -202,7 +232,6 @@ const RegisterUser = () => {
 
       {/* MODAL DETAIL */}
       <Modal
-      
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Data Lengkap Pendaftar">
@@ -217,12 +246,12 @@ const RegisterUser = () => {
           <div className="space-y-6 items-center">
             {/* Profil Singkat */}
             <div className="flex items-center gap-4 p-5 bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl border border-neutral-100 dark:border-neutral-700">
-              <div className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xl font-black">
-                {registrationDetail.fullName[0]}
-              </div>
-              <div>
+              <div className="flex justify-center gap-4 flex-col items-center w-full">
                 <h3 className="font-bold text-xl text-neutral-900 dark:text-white">
-                  {registrationDetail.fullName}
+                  Nama Lengkap:{" "}
+                  <span className="text-primary-500 dark:text-secondary-600">
+                    {registrationDetail.fullName}
+                  </span>
                 </h3>
                 <Badge
                   variant={
@@ -236,7 +265,7 @@ const RegisterUser = () => {
             </div>
 
             {/* Grid Data */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {[
                 { label: "NIK", value: registrationDetail.ktpNumber },
                 { label: "Tempat Lahir", value: registrationDetail.birthPlace },
@@ -262,12 +291,6 @@ const RegisterUser = () => {
                   label: "Alamat Pewaris",
                   value: registrationDetail.heirAddress,
                 },
-                {
-                  label: "Verifikasi",
-                  value: registrationDetail.isVerified
-                    ? "Terveifikasi"
-                    : "Belum Diverifikasi",
-                },
               ].map((item, idx) => (
                 <div
                   key={idx}
@@ -290,6 +313,41 @@ const RegisterUser = () => {
                 </div>
               ))}
             </div>
+
+            {historyTransactionDetail ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-wider text-neutral-400">
+                    Foto KTP
+                  </p>
+                  <img
+                    src={historyTransactionDetail.buktiKTP}
+                    alt="Bukti KTP"
+                    className="w-full h-48 object-cover rounded-xl border border-neutral-100 dark:border-neutral-800 cursor-pointer"
+                    onClick={() =>
+                      setPreviewImage(historyTransactionDetail.buktiKTP)
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-wider text-neutral-400">
+                    Bukti Transfer
+                  </p>
+                  <img
+                    src={historyTransactionDetail.buktiTransfer}
+                    alt="Bukti Transfer"
+                    className="w-full h-48 object-cover rounded-xl border border-neutral-100 dark:border-neutral-800 cursor-pointer"
+                    onClick={() =>
+                      setPreviewImage(historyTransactionDetail.buktiTransfer)
+                    }
+                  />
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-neutral-400 italic text-center">
+                Belum ada bukti transfer yang diunggah.
+              </p>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
@@ -317,6 +375,23 @@ const RegisterUser = () => {
           </div>
         )}
       </Modal>
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/80"
+          onClick={() => setPreviewImage(null)}>
+          <button
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors cursor-pointer">
+            <X size={24} />
+          </button>
+          <img
+            src={previewImage}
+            alt="Preview"
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+          />
+        </div>
+      )}
     </div>
   );
 };

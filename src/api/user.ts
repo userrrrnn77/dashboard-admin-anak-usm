@@ -41,3 +41,7 @@ export const getRegistrationById = (id: string) =>
 
 export const deleteRegistrationById = (id: string) =>
   api.delete<ResponseBre>(`/registration/${id}`);
+
+export const getAllBuktiTransfer = () => api.get<ResponseBre>("/transaction/historyTransaction")
+
+export const getBuktiTransferById = (id: string) => api.get<ResponseBre>(`/transaction/historyTransaction/${id}`)

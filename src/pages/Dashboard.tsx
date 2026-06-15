@@ -7,6 +7,15 @@ import { type User } from "../api/user";
 import { type CreateBaitulMaal } from "../api/baitulMaal";
 import { useProduct } from "../hooks/useProduct";
 import Title from "../components/common/Title";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const Dashboard = () => {
   // Casting manual di sini biar TS kaga pusing pas panggil .length
@@ -22,6 +31,24 @@ const Dashboard = () => {
   const userList = users as User[];
   const regList = registrations as RegistrationData[]; // Registrasi biasanya strukturnya mirip User
   const programList = programs as CreateBaitulMaal[];
+
+  const chartData = (() => {
+    const grouped: Record<string, number> = {};
+
+    regList.forEach((reg) => {
+      if (!reg.createdAt) return;
+      const date = new Date(reg.createdAt).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+      });
+      grouped[date] = (grouped[date] || 0) + 1;
+    });
+
+    return Object.entries(grouped).map(([date, count]) => ({
+      date,
+      pendaftar: count,
+    }));
+  })();
 
   return (
     <div className="space-y-8">
@@ -60,10 +87,39 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Tailwind Suggestion: min-h-75 sesuai kemauan linter lu */}
         <div className="lg:col-span-2 bg-white dark:bg-neutral-800 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-700 min-h-75">
-          <h3 className="font-bold mb-4">Grafik Pertumbuhan (Coming Soon)</h3>
-          <div className="flex items-center justify-center h-full text-neutral-400 italic">
-            Visualisasi data nyusul, kita rakit CRUD dulu
-          </div>
+          <h3 className="font-bold mb-4">Grafik Pertumbuhan Pendaftar</h3>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full text-neutral-400 italic">
+              Lagi narik data...
+            </div>
+          ) : chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" stroke="#9ca3af" fontSize={12} />
+                <YAxis stroke="#9ca3af" fontSize={12} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#171717",
+                    border: "none",
+                    borderRadius: "8px",
+                    color: "#fff",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="pendaftar"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dot={{ fill: "#10b981" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-full text-neutral-400 italic">
+              Belum ada data pendaftar buat divisualisasi.
+            </div>
+          )}
         </div>
 
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-700">

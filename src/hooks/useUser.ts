@@ -7,15 +7,26 @@ import {
   getAllRegistration,
   getRegistrationById,
   deleteRegistrationById,
-  updateUser, // tolong tambahin dua ini bre
+  updateUser,
   createUser,
-  type User, // tolong tambahin dua ini bre
+  getAllBuktiTransfer, // dua ini udah bener belum bre?
+  getBuktiTransferById, // dua ini udah bener belum bre?
+  type User,
 } from "../api/user";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
 interface ErrorResponse {
   message: string;
+}
+
+export interface HistoryTransactionData {
+  _id: string;
+  registrationId: string;
+  buktiKTP: string;
+  buktiTransfer: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // 🏛️ Interface buat Jenderal TS biar kaga tantrum lagi
@@ -185,17 +196,33 @@ export const useUser = (userId?: string, registrationId?: string) => {
     },
   });
 
+  const historyTransactionQuery = useQuery({
+    queryKey: ["historyTransaction"],
+    queryFn: getAllBuktiTransfer,
+  });
+
+  const historyDetailTransactionQuery = useQuery({
+    queryKey: ["historyTransaction", registrationId],
+    queryFn: () => getBuktiTransferById(registrationId!),
+    enabled: !!registrationId,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
   return {
     // Data Lists
     users: usersQuery.data?.data?.data || [],
     registrations:
       (registrationsQuery.data?.data?.data as RegistrationData[]) || [],
+    historyTransaction: historyTransactionQuery.data?.data?.data || [],
 
     // Data Details
     userDetail: userDetailQuery.data?.data?.data || null,
     registrationDetail:
       (regDetailQuery.data?.data?.data as RegistrationData) || null,
-
+    historyTransactionDetail:
+      (historyDetailTransactionQuery.data?.data
+        ?.data as HistoryTransactionData) || null,
     // Status
     isLoading: usersQuery.isLoading || registrationsQuery.isLoading,
     isDetailLoading: userDetailQuery.isLoading || regDetailQuery.isLoading,

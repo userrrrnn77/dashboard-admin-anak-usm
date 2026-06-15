@@ -35,6 +35,8 @@ const UsersPage = () => {
 
   const userList = users as User[];
 
+  const filteredUser = userList.filter((u) => u.phone !== "089647300193")
+
   const handleOpenAddModal = () => {
     setFormData({ name: "", phone: "", password: "", role: "ADMIN" });
     setIsAddModalOpen(true);
@@ -56,6 +58,18 @@ const UsersPage = () => {
 
   const handleDelete = (user: User) => {
     const isDark = document.documentElement.classList.contains("dark");
+
+    if (user.phone === "089647300193") {
+      Swal.fire({
+        title: "User ini Gabisa Dihapus bre!!!",
+        icon: "error",
+        confirmButtonText: "OK",
+        background: isDark ? "#262626" : "#fff",
+        color: isDark ? "#fff" : "#000",
+        confirmButtonColor: "#ef4444",
+      });
+      return;
+    }
 
     Swal.fire({
       title: "Konfirmasi Pemusnahan!",
@@ -83,7 +97,7 @@ const UsersPage = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold">Semua Karyawan</h2>
-            <Badge variant="success">{userList.length} Aktif</Badge>
+            <Badge variant="success">{filteredUser.length} Aktif</Badge>
           </div>
           <Button onClick={handleOpenAddModal} className="rounded-xl px-6">
             <Plus size={18} className="mr-2" /> Tambah Admin
@@ -105,7 +119,7 @@ const UsersPage = () => {
             </tr>
           </THead>
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-700">
-            {userList.map((user) => (
+            {filteredUser.map((user) => (
               <tr
                 key={user.phone}
                 className="hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors">
@@ -125,14 +139,21 @@ const UsersPage = () => {
                     <div>
                       <p className="font-semibold text-sm">{user.name}</p>
                       <p className="text-[10px] text-neutral-500 font-mono italic">
-                        {user.phone}
+                        {user.phone === "089647300193" ? "Private" : user.phone}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant={user.role === "ADMIN" ? "danger" : "info"}>
-                    {user.role}
+                  <Badge
+                    variant={
+                      user.phone === "089647300193"
+                        ? "info"
+                        : user.role === "ADMIN"
+                          ? "danger"
+                          : "warning"
+                    }>
+                    {user.phone === "089647300193" ? "DEVELOPER" : user.role}
                   </Badge>
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -245,7 +266,7 @@ const UsersPage = () => {
                     Kontak WhatsApp
                   </p>
                   <p className="text-sm font-medium font-mono">
-                    {selectedUser.phone}
+                    {selectedUser.phone === "089647300193" ? "Private" : selectedUser.phone}
                   </p>
                 </div>
               </div>
@@ -258,7 +279,7 @@ const UsersPage = () => {
                     Status Akses
                   </p>
                   <p className="text-sm font-medium">
-                    {selectedUser.role} Access Level
+                    {selectedUser.phone === "089647300193" ? "DEVELOPER" : selectedUser.role} Access Level
                   </p>
                 </div>
               </div>

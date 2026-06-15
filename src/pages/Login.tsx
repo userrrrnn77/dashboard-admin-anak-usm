@@ -55,7 +55,8 @@ const Login = () => {
             <Input
               label="Nomor WhatsApp"
               placeholder="08123xxx"
-              type="tel"
+              type="number"
+              inputMode="numeric"
               value={formData.phone}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
