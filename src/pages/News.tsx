@@ -35,7 +35,7 @@ interface NewsItem {
   createdAt?: string;
 }
 
-type CategoryType = "Berita Koperasi" | "Artikel" | "Pengumuman";
+type CategoryType = "Berita Koperasi" | "Artikel" | "Info";
 
 const News = () => {
   // Panggil React-Query Hooks yang sudah kita bangun sebelumnya
@@ -324,7 +324,7 @@ const News = () => {
               }>
               <option value="Berita Koperasi">Berita Koperasi</option>
               <option value="Artikel">Artikel / Edukasi</option>
-              <option value="Pengumuman">Pengumuman Resmi</option>
+              <option value="Info">Info Terkini</option>
             </select>
           </div>
 
