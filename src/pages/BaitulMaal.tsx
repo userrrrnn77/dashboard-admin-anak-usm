@@ -296,7 +296,8 @@ const BaitulMaal = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={isEditMode ? "Update Program" : "Rilis Program Baru"}>
+        title={isEditMode ? "Update Program" : "Rilis Program Baru"}
+        maxWidth="max-w-3xl">
         <form
           onSubmit={handleSubmit}
           className="space-y-4 max-h-[75vh] overflow-y-auto pr-2 custom-scrollbar">
@@ -409,6 +410,41 @@ const BaitulMaal = () => {
               </div>
             ))}
           </div>
+
+          {isEditMode && formData.images.length > 0 && (
+            <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
+              <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
+                <ImageIcon size={16} /> Gambar Saat Ini (
+                {formData.images.length})
+              </label>
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {formData.images.map((img, idx) => (
+                  <div key={idx} className="relative shrink-0">
+                    <img
+                      src={img}
+                      className="w-16 h-16 object-cover rounded-lg border-2 border-neutral-200 dark:border-neutral-700"
+                      alt={`Existing ${idx}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          images: formData.images.filter((_, i) => i !== idx),
+                        })
+                      }
+                      className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 shadow-md hover:bg-red-600 transition-colors">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-neutral-400 mt-2">
+                Klik ❌ buat hapus gambar lama. Sisa minimal 1 gambar (lama +
+                baru).
+              </p>
+            </div>
+          )}
 
           <div className="p-4 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/50">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2 mb-3">
